@@ -1,0 +1,9 @@
+{
+  "Datasets": [
+    {
+      "name": "DogsCats",
+      "labels": ["Dog", "Cat"],
+      "descriptions": ["DogsCats/description.json"]
+    }
+  ]
+}

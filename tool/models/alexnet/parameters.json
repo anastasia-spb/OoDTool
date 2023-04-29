@@ -1,0 +1,8 @@
+{
+  "Parameters":
+    {
+      "model_weights": "alexnet_0.9781100478468899_10-Apr-2023_14-21-13.pth",
+      "dropout": 0.41,
+      "num_classes": 2
+    }
+}
