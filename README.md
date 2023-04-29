@@ -2,9 +2,7 @@
 
 <img src="readme_data/ood_logo_v3.png" width="400px">
 
-**OoD Tool**
-
-Data Exploration Tool
+**Data Exploration Tool**
 ______________________________________________________________________
 
 ## Getting Started
