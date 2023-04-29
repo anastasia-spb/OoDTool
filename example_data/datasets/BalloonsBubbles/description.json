@@ -1,0 +1,37 @@
+{
+  "Dataset":
+    {
+        "folders": [
+        {
+          "path": "balloon/test",
+          "test": true,
+          "label": "balloon"
+        },
+        {
+          "path": "balloon/train",
+          "test": false,
+          "label": "balloon"
+        },
+        {
+          "path": "bubble/test",
+          "test": true,
+          "label": "bubble"
+        },
+        {
+          "path": "bubble/train",
+          "test": false,
+          "label": "bubble"
+        },
+        {
+          "path": "ood_test",
+          "test": true,
+          "label": "bubble"
+        }
+        ],
+      "metadata":
+      {
+        "source": "",
+        "author": ""
+      }
+    }
+}

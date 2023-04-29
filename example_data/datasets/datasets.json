@@ -1,0 +1,15 @@
+{
+  "Datasets": [
+    {
+      "name": "DogsCats",
+      "labels": ["Dog", "Cat"],
+      "descriptions": ["DogsCats/description.json"]
+    },
+    {
+      "name": "BalloonsBubbles",
+      "labels": ["bubble", "balloon"],
+      "descriptions": ["BalloonsBubbles/description.json"],
+      "notes": "This dataset contains labels from ImageNet (971 and 417)"
+    }
+  ]
+}
