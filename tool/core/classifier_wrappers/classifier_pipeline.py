@@ -1,18 +1,19 @@
+import os
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from tool import data_types
-from tool.classifiers.logistic_regression.lr_wrapper import LogisticRegressionWrapper
-from tool.classifiers.svm_svc.smv_svc_wrapper import SVCWrapper
-from tool.classifiers.linear_classifier.linear_classifier_wrapper import LinearClassifierWrapper
+from tool.core import data_types
+from tool.core.classifier_wrappers.classifiers.logistic_regression.lr_wrapper import LogisticRegressionWrapper
+from tool.core.classifier_wrappers.classifiers.svm_svc.smv_svc_wrapper import SVCWrapper
+from tool.core.classifier_wrappers.classifiers.linear_classifier.linear_classifier_wrapper import LinearClassifierWrapper
 
 CLASSIFIER_WRAPPERS = {LogisticRegressionWrapper.tag: LogisticRegressionWrapper,
                        SVCWrapper.tag: SVCWrapper,
                        LinearClassifierWrapper.tag: LinearClassifierWrapper}
 
 
-class Classifier:
+class ClassifierPipeline:
     def __init__(self, classifier_tag: str):
         self.probabilities = {data_types.RelativePathType.name(): [],
                               data_types.ClassProbabilitiesType.name(): np.ndarray}
@@ -62,6 +63,25 @@ class Classifier:
         self.probabilities[data_types.RelativePathType.name()] = data_df[data_types.RelativePathType.name()].copy()
         num_classes = len(data_df[data_types.LabelsType.name()][0])
         return X_train, y_train, X, num_classes
+
+    def __store(self, probabilities_df, embeddings_file: str, kwargs: dict, store_in_folder):
+        base = os.path.splitext(os.path.basename(embeddings_file))[0]
+        timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
+        name = "".join((base, timestamp_str, '.clf.pkl'))
+        if store_in_folder:
+            output_pkl_dir = os.path.join(self.settings.metadata_folder,
+                                          string_from_kwargs(self.classifier.get_tag(), kwargs))
+            if not os.path.exists(output_pkl_dir):
+                os.makedirs(output_pkl_dir)
+            file = os.path.join(output_pkl_dir, name)
+        else:
+            name = "".join((string_from_kwargs(self.classifier.get_tag(), kwargs), name))
+            file = os.path.join(self.settings.metadata_folder, name)
+
+        probabilities_df.to_pickle(file)
+        self.output_file.append(file)
+        self.probabilities_pkl_file.append(file)
+
 
     def run(self, embeddings_file, output_dir, use_gt_for_training, kwargs):
         X_train, y_train, X, num_classes = self.__prepare_data(embeddings_file, use_gt_for_training,

@@ -14,7 +14,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtGui import QIcon
 
 from tool.qt_utils.images_grid import ImagesGrid
-from tool.neigbours_search import get_neighbours
+from tool.core.distance_wrapper import get_neighbours
 
 
 def string_from_kwargs(tag, kwargs: dict):

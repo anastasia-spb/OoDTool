@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from sklearn.metrics import accuracy_score, confusion_matrix
 
 from tool.classifiers.classifier import Classifier
-from tool.classifiers.linear_classifier.linear_classifier_wrapper import LinearClassifierWrapper
+from tool.core.classifier_wrappers.classifiers.linear_classifier.linear_classifier_wrapper import LinearClassifierWrapper
 
 from tool import data_types
 

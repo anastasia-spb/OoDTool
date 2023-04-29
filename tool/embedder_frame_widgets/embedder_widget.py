@@ -115,19 +115,7 @@ class EmbedderFrame(QFrame):
         self.embeddings_calc_thread.start()
 
     def __store_embeddings(self):
-        embeddings_df = self.embeddings_calc_thread.get_model_output()
-        if embeddings_df.empty:
-            QMessageBox.warning(self, "EmbedderWidget", "Embeddings df is empty")
-            return
-
-        timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
-        embedding = embeddings_df[data_types.EmbeddingsType.name()][0]
-        embedding_dim = len(embedding)
-
-        name = "".join((self.selected_model, "_", self.settings.dataset_name, "_", str(embedding_dim),  "_",
-                        timestamp_str, '.emb.pkl'))
-        self.embeddings_pkl_file = os.path.join(self.settings.metadata_folder, name)
-        embeddings_df.to_pickle(self.embeddings_pkl_file)
+        self.embeddings_pkl_file = self.embeddings_calc_thread.get_embeddings_pkl_file()
         self.output_file.setText(self.embeddings_pkl_file)
 
     def signal_accept(self, msg):

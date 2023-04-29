@@ -5,7 +5,7 @@ from PIL import Image
 
 from tool.qt_utils import find_pkl
 from tool.qt_utils.qt_types import ImageInfo
-from tool import data_types
+from tool.core import data_types
 
 
 def get_k_neighbours(info: ImageInfo, k: int):
@@ -22,7 +22,6 @@ def get_k_neighbours(info: ImageInfo, k: int):
     img_row = img_row.values.tolist()
     distances = np.array(img_row, dtype=np.dtype('float64'))
     smallest_dist_indices = np.argsort(np.absolute(distances[0]))[:k]
-    # smallest_dist_indices = np.argpartition(np.absolute(distances[0]), k)[:k]
 
     images_paths = [distances_df[data_types.RelativePathType.name()][i] for i in smallest_dist_indices]
     images_meta = [ImageInfo(path=path, score=-1.0, probs=[-1.0, -1.0], labels=info.labels,

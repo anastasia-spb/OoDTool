@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from typing import List
 import pandas as pd
@@ -6,8 +7,8 @@ import math
 
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-from tool.models.alexnet.alexnet_wrapper import AlexNetWrapper
-from tool.models.timm_resnet.timm_resnet_wrapper import TimmResnetWrapper
+from tool.core.model_wrappers.models.alexnet.alexnet_wrapper import AlexNetWrapper
+from tool.core.model_wrappers.models.timm_resnet.timm_resnet_wrapper import TimmResnetWrapper
 from tool.core.model_wrappers.embedder_pipeline import EmbedderPipeline
 from tool.core import data_types
 
@@ -57,29 +58,37 @@ def test(test_data: TestData, store_embeddings: bool):
         model_output_df.to_pickle(''.join((test_data.embedder_name, '_', 'test_pipeline.emb.pkl')))
 
 
-ALEXNET_TEST_PARAMS = TestData('/home/vlasova/datasets', 'test_data/SummerWinter.meta.pkl', AlexNetWrapper.get_name(),
-                               {"weights_path": '/home/vlasova/Desktop/gitlab/oodtool/tool/models/alexnet/alexnet_0.9805023923444977_12-Apr-2023_16-16-06_SummerWinter.pth'},
-                               0.84)
+DATASET_ROOT = '../../../../example_data/datasets'
+WORKING_DIR = '../../../../example_data/tool_working_dir'
 
-TIMM_DENSNET_TEST_PARAMS = TestData('/home/vlasova/datasets', 'test_data/ImageNetVegetables.meta.pkl',
+ALEXNET_TEST_PARAMS = TestData(DATASET_ROOT,
+                               os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
+                               AlexNetWrapper.get_name(),
+                               {"weights_path": '../../../../pretrained_weights/embedders/AlexNet_BalloonsBubbles.pth',
+                                "model_labels": ["bubble", "balloon"]},
+                               0.36)
+
+TIMM_DENSNET_TEST_PARAMS = TestData(DATASET_ROOT,
+                                    os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
                                     TimmResnetWrapper.get_name(),
                                     {"model_checkpoint": 'densenet121'},
-                                    0.89)
+                                    0.68)
 
-TIMM_RESNET_TEST_PARAMS = TestData('/home/vlasova/datasets', 'test_data/ImageNetVegetables.meta.pkl',
+TIMM_RESNET_TEST_PARAMS = TestData(DATASET_ROOT,
+                                   os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
                                    TimmResnetWrapper.get_name(),
                                    {"model_checkpoint": 'resnet34'},
-                                   0.88)
+                                   0.68)
 
-TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData('/home/vlasova/datasets', 'test_data/DroneBird.meta.pkl',
+TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DATASET_ROOT,
+                                                      os.path.join(WORKING_DIR, 'DogsCats/DogsCats.meta.pkl'),
                                                       TimmResnetWrapper.get_name(),
                                                       {"model_checkpoint": 'resnet34'},
-                                                      0.4)
+                                                      0.46)
 
 
 def test_pipeline(store_embeddings: bool):
     testdata = [
-        # REGNET_TEST_PARAMS,
         # ALEXNET_TEST_PARAMS,
         TIMM_DENSNET_TEST_PARAMS,
         # TIMM_RESNET_TEST_PARAMS,
@@ -90,8 +99,6 @@ def test_pipeline(store_embeddings: bool):
         print("Testing {0}".format(test_data.embedder_name))
         test(test_data, store_embeddings)
         print("===========================================")
-
-    print("RESULT ARE APPROXIMATE IF DATABASE CLASSES DON'T MATCH WITH MODEL CLASSES")
 
 
 if __name__ == "__main__":

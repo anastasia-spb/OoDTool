@@ -78,20 +78,7 @@ class ProjectorFrame(QFrame):
     def __fit_embeddings(self):
         self.generate_button.setEnabled(False)
         projector = DataProjector(self.selected_method)
-        if projector is None:
-            return
-
-        data_df = pd.read_pickle(find_pkl.get_embeddings_file(self.settings.metadata_folder))
-        # TODO: drop embeddings
-        X = data_df[types.EmbeddingsType.name()].tolist()
-        embeddings = np.array(X, dtype=np.dtype('float64'))
-        x = projector.fit_transform(embeddings)
-
-        data_df[types.ProjectedEmbeddingsType.name()] = x.tolist()
-
-        timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
-        name = "".join((self.selected_method, "_", timestamp_str, ".2emb.pkl"))
-        self.output_file = os.path.join(self.settings.metadata_folder, name)
-        data_df.to_pickle(self.output_file)
+        self.output_file = projector.project(metadata_folder=self.settings.metadata_folder,
+                                             embeddings_file=find_pkl.get_embeddings_file(self.settings.metadata_folder))
         self.output_file_line.setText(self.output_file)
         self.generate_button.setEnabled(True)

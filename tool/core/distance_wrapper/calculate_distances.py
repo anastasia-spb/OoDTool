@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from scipy.spatial import distance
 
-from tool import data_types
+from tool.core import data_types
 
 
 def store_result(data_df, distance_mat: np.ndarray):
@@ -43,7 +43,5 @@ def cosine_distances(embeddings_pkl):
 
 
 if __name__ == "__main__":
-    # input_data = '/home/vlasova/datasets/0metadata/DogsCats/ResNetDogsCats230425_093807.emb.pkl'
-    input_data = '/home/vlasova/datasets/0metadata/CarLightsBox545/RegnetWrapper_CarLightsBox545_784_230428_174009.emb.pkl'
-    # input_data = '/home/vlasova/datasets/0metadata/DroneBird/ResNetDroneBird230424_191030.emb.pkl'
+    input_data = '../../../example_data/tool_working_dir/BalloonsBubbles/TimmResnetWrapper_BalloonsBubbles_1024_230430_001343.emb.pkl'
     cosine_distances(input_data)

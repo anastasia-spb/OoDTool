@@ -5,6 +5,8 @@ scipy
 matplotlib~=3.7.1
 tqdm
 Pillow
+trimap
+umap-learn
 
 huggingface-hub
 torch~=2.0.0

@@ -1,17 +1,19 @@
 import gc
+import os
 import pandas as pd
 from tqdm import tqdm
 from typing import Callable, List
 import numpy as np
+from datetime import datetime
 
 import torch
 from torch.utils.data import DataLoader
 
-from tool.models.utils.jpeg_dataset import JpegDataset
+from tool.core.model_wrappers.models.utils.jpeg_dataset import JpegDataset
 from tool.core.data_types import types
 
-from tool.models.alexnet.alexnet_wrapper import AlexNetWrapper
-from tool.models.timm_resnet.timm_resnet_wrapper import TimmResnetWrapper
+from tool.core.model_wrappers.models.alexnet.alexnet_wrapper import AlexNetWrapper
+from tool.core.model_wrappers.models.timm_resnet.timm_resnet_wrapper import TimmResnetWrapper
 
 MODEL_WRAPPERS = {AlexNetWrapper.get_name(): AlexNetWrapper,
                   TimmResnetWrapper.get_name(): TimmResnetWrapper}
@@ -22,6 +24,9 @@ class EmbedderPipeline:
         self.metadata_file = metadata_file
         self.data_dir = data_dir
 
+        self.metadata_folder, self.dataset_name = os.path.split(self.metadata_file)
+        self.dataset_name = self.dataset_name[0:int(self.dataset_name.find('.meta.pkl'))]
+
         if use_cuda:
             self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
             self.__empty_cache()
@@ -30,6 +35,8 @@ class EmbedderPipeline:
 
         self.model_wrapper = MODEL_WRAPPERS[model_wrapper_name](self.device, **kwargs)
         self.loader = None
+
+        self.embeddings_pkl_file = None
 
         self.model_output_df = pd.read_pickle(self.metadata_file)
 
@@ -51,6 +58,9 @@ class EmbedderPipeline:
     def get_model_output(self) -> pd.DataFrame:
         return self.model_output_df
 
+    def get_embeddings_pkl_file(self) -> str:
+        return self.embeddings_pkl_file
+
     def predict(self, callback: Callable[[List[int]], None]):
         self.__setup()
 
@@ -61,6 +71,18 @@ class EmbedderPipeline:
                 model_output.append(self.__forward(img))
 
         self.__postprocessing(model_output)
+        self.__save_model_output(self.dataset_name, self.metadata_folder)
+
+    def __save_model_output(self, dataset_name, metadata_folder):
+        timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
+        embedding = self.model_output_df[types.EmbeddingsType.name()][0]
+        embedding_dim = len(embedding)
+
+        name = "".join((self.model_wrapper.get_name(), "_", dataset_name, "_", str(embedding_dim), "_",
+                        timestamp_str, '.emb.pkl'))
+
+        self.embeddings_pkl_file = os.path.join(metadata_folder, name)
+        self.model_output_df.to_pickle(self.embeddings_pkl_file)
 
     def __empty_cache(self):
         if self.device == torch.device('cuda'):

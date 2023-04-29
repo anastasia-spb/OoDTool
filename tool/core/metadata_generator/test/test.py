@@ -7,7 +7,7 @@ def test():
     path = '../../../../example_data/datasets/datasets.json'
     output_folder = '.'
 
-    dataset_name = 'BalloonsBubbles'
+    dataset_name = 'DogsCats'
     meta_file_path = generate_metadata(path, dataset_name, output_folder)
 
     data_df = pd.read_pickle(meta_file_path)

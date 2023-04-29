@@ -1,5 +1,8 @@
 from PyQt5.QtCore import QThread, pyqtSignal
 
+from tool.core.model_wrappers.embedder_pipeline import EmbedderPipeline
+
+
 class EmbedderPipelineThread(QThread, EmbedderPipeline):
     _signal = pyqtSignal(list)
 

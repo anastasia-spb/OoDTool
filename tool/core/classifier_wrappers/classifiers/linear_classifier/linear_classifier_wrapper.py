@@ -7,7 +7,7 @@ from torch.utils.data import random_split, DataLoader, TensorDataset
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 
-from tool.classifiers.i_classifier import IClassifier
+from tool.core.classifier_wrappers.classifiers.i_classifier import IClassifier
 
 
 class LinearClassifier(pl.LightningModule):

@@ -5,7 +5,7 @@ from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from tool.classifiers.i_classifier import IClassifier
+from tool.core.classifier_wrappers.classifiers.i_classifier import IClassifier
 
 
 class SVCWrapper(IClassifier):

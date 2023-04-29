@@ -23,44 +23,15 @@ python3 main.py
 
 Tool for image classification dataset analysis:
 
-* Generate embeddings and predictions for selected data by 
-* * using one of supported pretrained models from `timm` deep-learning library (https://timm.fast.ai/)
-* * integrating your own embedder model
+### Generate embeddings and predictions for selected data by 
+* Using one of supported pretrained models from `timm` deep-learning library (https://timm.fast.ai/)
+* Integrating your own embedder model
 
-* Project embeddings to 2D plane: umap, t-SNE, trimap, PCA+t-SNE
-* Search nearest neighbours using cosine or euclidian distance
-* Calculate OoD Score:
-* * Method 1: 
+### Project embeddings to 2D plane: umap, t-SNE, trimap, PCA+t-SNE
+### Search nearest neighbours using cosine or euclidian distance
+### Calculate OoD Score:
 
-Tool for OoD score calculation and analysis.
-
-The OoD score of each sample is the entropy of the
-averaged probability distribution of all classifiers [[1]](#1)
-
-For one dataset multiple Embedders and Classifiers can be selected.
-Each Embedder output will be combined with each Classifier. Resulting probabilities are averaged.
-
-
-## __Installation__
-
-See W/box/box/avlasova/ood_video_howto/ood_install.mp4
-
-
-```commandline
-git clone ssh://git@gitlab.cognitivepilot.com:8022/ml/utilities/oodtool.git
-
-cd oodtool/
-
-python3 -m venv ood_env
-
-source ood_env/bin/activate
-
-pip install --upgrade pip
-
-pip install .
-
-python3 main.py
-```
+The OoD score of each sample is the entropy of the averaged probability distribution of all classifiers [[1]](#1)
 
 ## __Datasets__
 

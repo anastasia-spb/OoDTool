@@ -2,7 +2,7 @@ import numpy as np
 from typing import Optional
 
 from sklearn.linear_model import LogisticRegression
-from tool.classifiers.i_classifier import IClassifier
+from tool.core.classifier_wrappers.classifiers.i_classifier import IClassifier
 
 
 class LogisticRegressionWrapper(IClassifier):

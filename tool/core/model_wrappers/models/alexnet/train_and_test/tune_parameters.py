@@ -15,10 +15,10 @@ from tool.core.model_wrappers.models.alexnet.alexnet_module import AlexNet, Alex
 from tool.core.model_wrappers.models.alexnet.train_and_test.utils import epoch_train
 from tool.core.model_wrappers.models.utils.jpeg_dataset import JpegTrainDataset
 
-DATA_ROOT_DIR = '/home/vlasova/datasets/'
-METADATA_FILE = '/home/vlasova/datasets/0metadata/SummerWinter/SummerWinter.meta.pkl'
-BATCHSIZE = 128
-CLASSES = 2  # Winter and Summer
+DATA_ROOT_DIR = '/home/nastya/Desktop/OoDTool/example_data/datasets'
+METADATA_FILE = '/home/nastya/Desktop/OoDTool/example_data/tool_working_dir/BalloonsBubbles/BalloonsBubbles.meta.pkl'
+BATCHSIZE = 64
+CLASSES = 2
 EPOCHS = 30
 
 
@@ -78,7 +78,7 @@ def objective(trial):
 
 def start_optimization():
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=100, timeout=None)
+    study.optimize(objective, n_trials=30, timeout=None)
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
     complete_trials = study.get_trials(deepcopy=False, states=[TrialState.COMPLETE])
