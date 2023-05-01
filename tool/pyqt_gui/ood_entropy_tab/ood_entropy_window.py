@@ -56,6 +56,9 @@ class EmbeddingsFilesFrame(QFrame):
 
     def __get_all_embeddings_files(self):
         self.files = []
+        if not os.path.exists(self.settings.metadata_folder):
+            return
+
         for file in os.listdir(self.settings.metadata_folder):
             if file.endswith(".emb.pkl"):
                 self.files.append(file)
