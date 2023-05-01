@@ -1,26 +1,24 @@
 import os
+from datetime import datetime
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+from typing import List, Optional
 
 from tool.core import data_types
+from tool.core.utils import data_helpers
 from tool.core.classifier_wrappers.classifiers.logistic_regression.lr_wrapper import LogisticRegressionWrapper
-from tool.core.classifier_wrappers.classifiers.svm_svc.smv_svc_wrapper import SVCWrapper
-from tool.core.classifier_wrappers.classifiers.linear_classifier.linear_classifier_wrapper import LinearClassifierWrapper
+from tool.core.classifier_wrappers.classifiers.linear_classifier.linear_classifier_wrapper import \
+    LinearClassifierWrapper
 
 CLASSIFIER_WRAPPERS = {LogisticRegressionWrapper.tag: LogisticRegressionWrapper,
-                       SVCWrapper.tag: SVCWrapper,
                        LinearClassifierWrapper.tag: LinearClassifierWrapper}
 
 
 class ClassifierPipeline:
     def __init__(self, classifier_tag: str):
-        self.probabilities = {data_types.RelativePathType.name(): [],
-                              data_types.ClassProbabilitiesType.name(): np.ndarray}
+        self.probabilities_df = pd.DataFrame()
         self.classifier = CLASSIFIER_WRAPPERS[classifier_tag]()
-
-    def get_tag(self):
-        return self.classifier.tag
 
     def input_hint(self):
         return self.classifier.input_hint()
@@ -31,13 +29,17 @@ class ClassifierPipeline:
     def check_input_kwargs(self, kwargs):
         return self.classifier.check_input_kwargs(kwargs)
 
-    def __prepare_data(self, embeddings_file, use_gt_for_training, inference_mode):
-        data_df = pd.read_pickle(embeddings_file)
-        self.probabilities[data_types.RelativePathType.name()] = data_df[data_types.RelativePathType.name()].copy()
-        num_classes = len(data_df[data_types.LabelsType.name()][0])
+    @staticmethod
+    def prepare_data(embeddings_files, use_gt_for_training, probabilities_file, inference_mode):
 
-        X = data_df[data_types.EmbeddingsType.name()].tolist()
-        X = np.array(X, dtype=np.dtype('float64'))
+        data_df, embeddings_columns = data_helpers.merge_data_files(embeddings_files, data_types.EmbeddingsType.name())
+        num_classes = data_helpers.get_number_of_classes(data_df)
+
+        def join_features(features_row):
+            return np.concatenate(features_row, axis=None, dtype=np.dtype('float64'))
+
+        embeddings_mat = data_df[embeddings_columns].values
+        X = np.apply_along_axis(join_features, axis=1, arr=embeddings_mat)
 
         if inference_mode:
             return None, None, X, num_classes
@@ -48,8 +50,7 @@ class ClassifierPipeline:
             y = np.array(y_true, dtype=np.dtype('float64'))
             train_indices = data_df.index[data_df[data_types.TestSampleFlagType.name()] == False].tolist()
         else:
-            predictions = data_df[data_types.ClassProbabilitiesType.name()].tolist()
-            y = np.argmax(predictions, axis=1)
+            y = data_helpers.get_predictions(probabilities_file)
             # For every sample embedder wrapper returns predictions of dim K+1, where K in number of classes.
             # We don't want to use samples for classifier training, which were classified into last (unknown) category
             valid_indices = np.asarray(y < num_classes).nonzero()
@@ -60,32 +61,41 @@ class ClassifierPipeline:
             return None, None, X, num_classes
 
         X_train, y_train = X[train_indices, :], y[train_indices]
-        self.probabilities[data_types.RelativePathType.name()] = data_df[data_types.RelativePathType.name()].copy()
         num_classes = len(data_df[data_types.LabelsType.name()][0])
-        return X_train, y_train, X, num_classes
+        return X_train, y_train, X, num_classes, data_df[data_types.RelativePathType.name()]
 
-    def __store(self, probabilities_df, embeddings_file: str, kwargs: dict, store_in_folder):
-        base = os.path.splitext(os.path.basename(embeddings_file))[0]
+    def __store(self, output_folder: str) -> str:
         timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
-        name = "".join((base, timestamp_str, '.clf.pkl'))
-        if store_in_folder:
-            output_pkl_dir = os.path.join(self.settings.metadata_folder,
-                                          string_from_kwargs(self.classifier.get_tag(), kwargs))
-            if not os.path.exists(output_pkl_dir):
-                os.makedirs(output_pkl_dir)
-            file = os.path.join(output_pkl_dir, name)
-        else:
-            name = "".join((string_from_kwargs(self.classifier.get_tag(), kwargs), name))
-            file = os.path.join(self.settings.metadata_folder, name)
+        name = "".join((self.classifier.tag, "_", timestamp_str, '.clf.pkl'))
+        file = os.path.join(output_folder, name)
+        self.probabilities_df.to_pickle(file)
+        return file
 
-        probabilities_df.to_pickle(file)
-        self.output_file.append(file)
-        self.probabilities_pkl_file.append(file)
+    def get_probabilities_df(self) -> pd.DataFrame:
+        return self.probabilities_df
 
+    def run(self, embeddings_files: List[str], output_dir: str, use_gt_for_training: bool,
+            probabilities_file: Optional[str], kwargs: List[dict]) -> str:
+        """Walks through dataset directory and stores metadata information about images into <dataset_name>.meta.pkl file.
+            Args:
+                embeddings_files: List of all files with embeddings
+                output_dir: Folder where will be stored output files and model weights if necessary
+                use_gt_for_training: If GT labels shall be used for training or predictions from probabilities_file.
+                probabilities_file: File with probabilities, which shall be used for training. Required only if
+                                    use_gt_for_training is set to False
+                kwargs: Classifier arguments
+            Returns:
+                Absolute path to <dataset_name>.clf.pkl file or None if input data are invalid.
+            """
+        X_train, y_train, X, num_classes, relative_paths = self.prepare_data(embeddings_files=embeddings_files,
+                                                                             use_gt_for_training=use_gt_for_training,
+                                                                             probabilities_file=probabilities_file,
+                                                                             inference_mode=
+                                                                             self.classifier.inference_mode())
+        self.probabilities_df[data_types.RelativePathType.name()] = relative_paths
+        for i, params in enumerate(kwargs):
+            probabilities = self.classifier.run(X_train, y_train, X, params, num_classes, output_dir)
+            self.probabilities_df["".join((data_types.ClassProbabilitiesType.name(), "_", str(i)))] = \
+                probabilities.tolist()
 
-    def run(self, embeddings_file, output_dir, use_gt_for_training, kwargs):
-        X_train, y_train, X, num_classes = self.__prepare_data(embeddings_file, use_gt_for_training,
-                                                               self.classifier.inference_mode())
-        probabilities = self.classifier.run(X_train, y_train, X, kwargs, num_classes, output_dir)
-        self.probabilities[data_types.ClassProbabilitiesType.name()] = probabilities.tolist()
-        return pd.DataFrame.from_dict(self.probabilities)
+        return self.__store(output_dir)

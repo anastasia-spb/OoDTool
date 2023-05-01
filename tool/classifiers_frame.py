@@ -13,7 +13,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 
 from tool.ood_settings import OoDSettings
-from tool.ood_score.ood_score import OoDScore
+from tool.core.ood_entropy.ood_score import OoDScore
 from tool.embedder_frame_widgets import classifier_widget
 from tool.classifiers.classifier import CLASSIFIER_WRAPPERS
 from tool.qt_utils import find_pkl

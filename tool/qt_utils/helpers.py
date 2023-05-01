@@ -17,13 +17,6 @@ from tool.qt_utils.images_grid import ImagesGrid
 from tool.core.distance_wrapper import get_neighbours
 
 
-def string_from_kwargs(tag, kwargs: dict):
-    name = tag
-    for value in kwargs.values():
-        name += "_" + str(value)
-    return name
-
-
 def get_dir_layout(callback_fn, output_dir_line, label, default_dir, parent):
     text = QLabel(label, parent)
     parent.layout.addWidget(text)

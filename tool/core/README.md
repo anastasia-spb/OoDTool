@@ -51,16 +51,16 @@ place of probabilities array will be always zero.
 3. ClassifierWrapper
 
 Expects .emb.pkl. and generates following data:
-* <classifier_name>_<classifier_parameters>/<embedder_name>_<database_name>_<timedate>.clf.pkl
+* <classifier_name>_<timedate>.clf.pkl
 * <classifier_name>Train folder with checkpoints
 
 Inside .clf.pkl:
 
 
-| relative_path                               |        class_probabilities        |
-|---------------------------------------------|:---------------------------------:|
-| BalloonsBubbles/bubble/test/bubble_2.jpg    | np.ndarray of shape(len(labels))  |
-| BalloonsBubbles/balloon/train/balloons3.jpg | np.ndarray of shape(len(labels))  |
+| relative_path                               |      class_probabilities_1       | ... |      class_probabilities_N       |
+|---------------------------------------------|:--------------------------------:|:---:|:--------------------------------:|
+| BalloonsBubbles/bubble/test/bubble_2.jpg    | np.ndarray of shape(len(labels)) | ... | np.ndarray of shape(len(labels)) |
+| BalloonsBubbles/balloon/train/balloons3.jpg | np.ndarray of shape(len(labels)) | ... | np.ndarray of shape(len(labels)) |
 
 
 4. OoDEntropyWrapper
