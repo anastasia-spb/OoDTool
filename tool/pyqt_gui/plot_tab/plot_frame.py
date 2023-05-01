@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from tool.data_types import types
+from tool.core.data_types import types
 import matplotlib as mpl
 
 from matplotlib.backends.backend_qt5agg import (
@@ -16,10 +16,13 @@ from PyQt5.QtWidgets import (
 
 from PyQt5.QtCore import pyqtSignal
 
-from tool.visualization_preprocessing.data_reader import DataReader
-from tool.analyze_settings import AnalyzeTabSettings
-from tool.qt_utils import find_pkl
-from tool.qt_utils.qt_types import ImageInfo
+from tool.pyqt_gui.plot_tab.visualization_preprocessing.data_reader import DataReader
+
+from tool.pyqt_gui.paths_settings import PathsSettings
+from tool.pyqt_gui.analyze_settings import AdditionalSettings
+
+from tool.pyqt_gui.qt_utils import find_pkl
+from tool.pyqt_gui.qt_utils.qt_types import ImageInfo
 
 
 class PlotLegendFrame(QFrame):
@@ -47,7 +50,8 @@ class PlotFrame(QFrame):
     def __init__(self, parent):
         super(PlotFrame, self).__init__(parent)
 
-        self.settings = AnalyzeTabSettings()
+        self.settings = PathsSettings()
+        self.analyze_settings = AdditionalSettings()
         self.data_reader = None
         self.highlight_test_samples = False
 
@@ -81,15 +85,15 @@ class PlotFrame(QFrame):
     def __update_plot(self, highlight_test):
         self._ax.cla()  # Clear axis
         self._ax.grid(True)
-        if not os.path.exists(self.settings.metadata_dir):
+        if not os.path.exists(self.settings.metadata_folder):
             return
-        emb_2d_file = find_pkl.get_2d_emb_file(self.settings.metadata_dir)
-        ood_score_file = find_pkl.get_ood_file(self.settings.metadata_dir)
+        emb_2d_file = find_pkl.get_2d_emb_file(self.settings.metadata_folder)
+        ood_score_file = find_pkl.get_ood_file(self.settings.metadata_folder)
         if not os.path.isfile(emb_2d_file):
             return
         self.data_reader = DataReader(self.settings.dataset_root_path, emb_2d_file,
-                                      ood_score_file, self.settings.use_gt_labels,
-                                      self.settings.ood_threshold)
+                                      ood_score_file, self.analyze_settings.use_gt_labels,
+                                      self.analyze_settings.ood_threshold)
         labels = self.data_reader.get_label()
         cmaps = ['Greens', 'Reds', 'Greys', 'Purples', 'Blues', 'Oranges',
                  'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd', 'RdPu', 'BuPu',
@@ -140,7 +144,7 @@ class PlotFrame(QFrame):
         for value in self.scatter_dict.values():
             x = np.take(self.data_reader.embeddings, value[0], axis=0)
             if self.data_reader.ood_score is not None:
-                if self.settings.ood_threshold > 0.0:
+                if self.analyze_settings.ood_threshold > 0.0:
                     ood_score = np.take(self.data_reader.ood_score_cmap, value[0], axis=0)
                 else:
                     ood_score = np.take(self.data_reader.ood_score, value[0], axis=0)
@@ -170,7 +174,7 @@ class PlotFrame(QFrame):
             prob = np.take(self.data_reader.probabilities, indices, axis=0)[ind]
 
         info = ImageInfo(paths[ind], ood_score, prob, self.data_reader.get_label(),
-                         self.settings.dataset_root_path, self.settings.metadata_dir)
+                         self.settings.dataset_root_path, self.settings.metadata_folder)
         self.image_path_signal.emit(info)
 
     def __show_hist(self):
@@ -185,4 +189,8 @@ class PlotFrame(QFrame):
 
     def inputs_changed(self, settings):
         self.settings = settings
+        self.__update_plot(self.highlight_test_samples)
+
+    def analyze_inputs_changed(self, settings):
+        self.analyze_settings = settings
         self.__update_plot(self.highlight_test_samples)

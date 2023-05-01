@@ -12,8 +12,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 
-from tool.ood_settings import OoDSettings
-from tool.qt_utils import find_pkl
+from tool.pyqt_gui.ood_settings import OoDSettings
 
 
 class ProbabilitiesFromPickleFrame(QWidget):

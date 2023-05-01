@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 from PIL import Image
 
-from tool.qt_utils import find_pkl
-from tool.qt_utils.qt_types import ImageInfo
+from tool.pyqt_gui.qt_utils import find_pkl
+from tool.pyqt_gui.qt_utils.qt_types import ImageInfo
 from tool.core import data_types
 
 

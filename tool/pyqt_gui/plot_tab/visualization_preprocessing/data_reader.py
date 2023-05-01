@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 
-from tool.data_types import types
+from tool.core.data_types import types
 
 
 class DataReader:

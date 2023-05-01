@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QPoint, QSize
 from PyQt5.QtGui import QPixmap, QPainter, QIcon, QColor
 
-from tool.qt_utils.qt_types import ImageInfo
+from tool.pyqt_gui.qt_utils.qt_types import ImageInfo
 from typing import Optional, List
 
 
@@ -79,7 +79,7 @@ class ImagesGrid(QWidget):
             self.layout.addWidget(pixmap_button, current_row_id, current_column_id)
 
     def __show_path(self, img_meta):
-        from tool.qt_utils.helpers import ImageWindow
+        from tool.pyqt_gui.qt_utils.helpers import ImageWindow
 
         show_image_window = ImageWindow(self)
         show_image_window.show_image(img_meta)

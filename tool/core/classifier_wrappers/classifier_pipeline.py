@@ -87,6 +87,9 @@ class ClassifierPipeline:
             Returns:
                 Absolute path to <dataset_name>.clf.pkl file or None if input data are invalid.
             """
+        if len(embeddings_files) == 0:
+            return ''
+
         X_train, y_train, X, num_classes, relative_paths = self.prepare_data(embeddings_files=embeddings_files,
                                                                              use_gt_for_training=use_gt_for_training,
                                                                              probabilities_file=probabilities_file,

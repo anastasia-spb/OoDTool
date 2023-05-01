@@ -1,8 +1,3 @@
-import os
-import pandas as pd
-import numpy as np
-from datetime import datetime
-
 from PyQt5.QtWidgets import (
     QPushButton,
     QVBoxLayout,
@@ -12,24 +7,24 @@ from PyQt5.QtWidgets import (
     QLabel
 )
 
-from tool.data_projectors.data_projector import DataProjector
-from tool.data_types import types
-from tool.ood_settings import OoDSettings
-from tool.qt_utils import find_pkl
+from tool.core.data_projectors.data_projector import DataProjector
+from tool.pyqt_gui.paths_settings import PathsSettings
+from tool.pyqt_gui.qt_utils import find_pkl
 
 
 class ProjectorFrame(QFrame):
 
-    def __init__(self, parent, settings: OoDSettings):
+    def __init__(self, parent):
         super(ProjectorFrame, self).__init__(parent)
 
         spacing_between_layouts = 30
-        self.settings = settings
+        self.settings = PathsSettings()
 
         self.output_file = ''
         self.selected_method = DataProjector.method_name
 
         self.setFrameShape(QFrame.StyledPanel)
+        self.setMaximumHeight(200)
         self.resize(100, 100)
         self.layout = QVBoxLayout()
 

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from tool.core.metadata_generator.generator import generate_metadata
+from tool.core.metadata_generator.generator import generate_metadata, get_datasets_names
 
 
 def test():
@@ -12,6 +12,9 @@ def test():
 
     data_df = pd.read_pickle(meta_file_path)
     print(data_df.to_string(index=False))
+
+    datasets = get_datasets_names(path)
+    print(datasets)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
 {
-    "dataset_root_path": "/home/vlasova/datasets",
-    "working_dir": "/home/vlasova/datasets/0metadata"
+    "dataset_root_path": "/home/nastya/Desktop/OoDTool/example_data/datasets",
+    "metadata_folder": "/home/nastya/Desktop/NIR/project/NIR/DroneBird"
 }

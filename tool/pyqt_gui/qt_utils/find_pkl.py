@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from tool.data_types import types
+from tool.core.data_types import types
 
 
 def get_ood_file(folder):

@@ -5,20 +5,16 @@ import random
 from PyQt5.QtWidgets import (
     QPushButton,
     QVBoxLayout,
-    QHBoxLayout,
-    QFileDialog,
     QFrame,
     QLineEdit,
-    QComboBox, QLabel, QMessageBox, QTableView,
+    QComboBox, QMessageBox, QTableView,
 )
 
-from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt, QAbstractTableModel, pyqtSignal
 
-from tool.metadata_utils.parse_datasets_description import get_datasets_names
-from tool.metadata_utils.generate_datasets_metadata import generate_metadata
-from tool.ood_settings import OoDSettings
-from tool.data_types import types
+from tool.core.metadata_generator.generator import generate_metadata, get_datasets_names
+from tool.pyqt_gui.paths_settings import PathsSettings
+from tool.core.data_types import types
 
 
 class TableModel(QAbstractTableModel):
@@ -44,13 +40,14 @@ class TableModel(QAbstractTableModel):
 
 
 class MetadataFrame(QFrame):
-    ood_settings_changed_signal = pyqtSignal(OoDSettings)
+    ood_settings_changed_signal = pyqtSignal(PathsSettings)
 
     def __init__(self, parent):
         super(MetadataFrame, self).__init__(parent)
 
-        self.settings = OoDSettings()
+        self.settings = PathsSettings()
         self.metadata_file = None
+        self.dataset_name = ''
 
         spacing_between_layouts = 30
 
@@ -66,7 +63,6 @@ class MetadataFrame(QFrame):
         self.layout.addWidget(self.preview_table)
 
         self.__get_json_file()
-        self.__emit_ood_settings_changed()
 
         self.setLayout(self.layout)
 
@@ -96,12 +92,10 @@ class MetadataFrame(QFrame):
             return
         self.datasets_combobox.clear()
         self.datasets_combobox.addItems(names)
-        self.datasets_combobox.setCurrentText(self.settings.dataset_name)
-        self.settings.set_metadata_folder()
+        self.datasets_combobox.setCurrentText(self.dataset_name)
 
     def __on_datasets_combobox_values_change(self, value):
-        self.settings.dataset_name = value
-        self.__emit_ood_settings_changed()
+        self.dataset_name = value
         self.generate_button.setEnabled(True)
 
     def __add_generate_metadata_button(self):
@@ -113,19 +107,14 @@ class MetadataFrame(QFrame):
     def __generate_metadata(self):
         self.generate_button.setEnabled(False)
         try:
-            self.settings.set_metadata_folder()
             self.metadata_file = generate_metadata(self.dataset_description_json_file,
-                                                   self.settings.dataset_name,
+                                                   self.dataset_name,
                                                    self.settings.metadata_folder)
-            self.__emit_ood_settings_changed()
         except Exception as error:
             print(error)
             QMessageBox.warning(self, "Metadata generation failed", str(error))
         self.generate_button.setEnabled(True)
         self.__preview_pkl_file()
-
-    def __emit_ood_settings_changed(self):
-        self.ood_settings_changed_signal.emit(self.settings)
 
     def __preview_pkl_file(self):
         if os.path.isfile(self.metadata_file):

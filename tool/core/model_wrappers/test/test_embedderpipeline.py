@@ -65,8 +65,8 @@ ALEXNET_TEST_PARAMS = TestData(DATASET_ROOT,
                                os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
                                AlexNetWrapper.get_name(),
                                {"weights_path": '../../../../pretrained_weights/embedders/AlexNet_BalloonsBubbles.pth',
-                                "model_labels": ["bubble", "balloon"]},
-                               0.36)
+                                "model_labels": "[bubble, balloon]"},
+                               0.63)
 
 TIMM_DENSNET_TEST_PARAMS = TestData(DATASET_ROOT,
                                     os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
@@ -89,8 +89,8 @@ TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DATASET_ROOT,
 
 def test_pipeline(store_embeddings: bool):
     testdata = [
-        # ALEXNET_TEST_PARAMS,
-        TIMM_DENSNET_TEST_PARAMS,
+        ALEXNET_TEST_PARAMS,
+        # TIMM_DENSNET_TEST_PARAMS,
         # TIMM_RESNET_TEST_PARAMS,
         # TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS,
     ]

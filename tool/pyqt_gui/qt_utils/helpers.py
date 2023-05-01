@@ -13,7 +13,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtGui import QIcon
 
-from tool.qt_utils.images_grid import ImagesGrid
+from tool.pyqt_gui.qt_utils.images_grid import ImagesGrid
 from tool.core.distance_wrapper import get_neighbours
 
 

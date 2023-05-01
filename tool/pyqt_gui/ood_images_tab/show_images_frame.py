@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-from tool import data_types
 import random
 import math
 from typing import List
@@ -20,11 +19,12 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
-from tool.analyze_settings import AnalyzeTabSettings
-from tool.data_types import types
-from tool.qt_utils import find_pkl
-from tool.qt_utils.images_grid import ImagesGrid
-from tool.qt_utils.qt_types import ImageInfo
+from tool.pyqt_gui.analyze_settings import AdditionalSettings
+from tool.pyqt_gui.paths_settings import PathsSettings
+from tool.core.data_types import types
+from tool.pyqt_gui.qt_utils import find_pkl
+from tool.pyqt_gui.qt_utils.images_grid import ImagesGrid
+from tool.pyqt_gui.qt_utils.qt_types import ImageInfo
 
 
 def get_images_to_show(ood_file_path: str, ascending: bool, labels: List[str], absolute_path_to_dataset: str,
@@ -39,15 +39,15 @@ def get_images_to_show(ood_file_path: str, ascending: bool, labels: List[str], a
         return conf
 
     if embeddings_df is not None:
-        ood_df = pd.merge(ood_df, embeddings_df[[data_types.RelativePathType.name(),
-                                                 data_types.ClassProbabilitiesType.name(),
-                                                 data_types.LabelType.name()]],
-                          on=data_types.RelativePathType.name(), how='inner')
+        ood_df = pd.merge(ood_df, embeddings_df[[types.RelativePathType.name(),
+                                                 types.ClassProbabilitiesType.name(),
+                                                 types.LabelType.name()]],
+                          on=types.RelativePathType.name(), how='inner')
 
         if use_gt_labels:
-            ood_df["confidence"] = ood_df[data_types.LabelType.name()].apply(lambda label: create_gt_conf(label))
+            ood_df["confidence"] = ood_df[types.LabelType.name()].apply(lambda label: create_gt_conf(label))
         else:
-            ood_df["confidence"] = ood_df[data_types.ClassProbabilitiesType.name()]
+            ood_df["confidence"] = ood_df[types.ClassProbabilitiesType.name()]
     else:
         ood_df["confidence"] = [0.0]
 
@@ -73,7 +73,8 @@ class ShowImagesFrame(QFrame):
     def __init__(self, parent):
         super(ShowImagesFrame, self).__init__(parent)
 
-        self.settings = AnalyzeTabSettings()
+        self.settings = PathsSettings()
+        self.additional_settings = AdditionalSettings()
 
         self.setFrameShape(QFrame.StyledPanel)
         self.resize(100, 100)
@@ -113,9 +114,9 @@ class ShowImagesFrame(QFrame):
     def __show(self, ascending=False, with_high_confidence=False):
         self.images_widget.clear_layout()
 
-        probabilities_file = find_pkl.get_embeddings_file(self.settings.metadata_dir)
-        ood_file = find_pkl.get_ood_file(self.settings.metadata_dir)
-        labels = find_pkl.get_classes_from_metadata_file(self.settings.metadata_dir)
+        probabilities_file = find_pkl.get_embeddings_file(self.settings.metadata_folder)
+        ood_file = find_pkl.get_ood_file(self.settings.metadata_folder)
+        labels = find_pkl.get_classes_from_metadata_file(self.settings.metadata_folder)
         if not os.path.isfile(probabilities_file):
             return
 
@@ -123,11 +124,14 @@ class ShowImagesFrame(QFrame):
         legend_colors = self.__create_legend(labels)
 
         images_meta = get_images_to_show(ood_file, ascending, labels, self.settings.dataset_root_path,
-                                         self.settings.metadata_dir, self.settings.ood_threshold,
-                                         with_high_confidence, legend_df, self.settings.use_gt_labels)
+                                         self.settings.metadata_folder, self.additional_settings.ood_threshold,
+                                         with_high_confidence, legend_df, self.additional_settings.use_gt_labels)
         self.images_widget.show_images(images_meta, legend_colors)
 
     def analyze_settings_changed(self, settings):
+        self.additional_settings = settings
+
+    def settings_changed(self, settings):
         self.settings = settings
 
     def __add_label(self, label_color, label_text, row, column):
@@ -168,7 +172,7 @@ class HistogramFrame(QFrame):
     def __init__(self, parent):
         super(HistogramFrame, self).__init__(parent)
 
-        self.settings = AnalyzeTabSettings()
+        self.settings = PathsSettings()
 
         self.setFrameShape(QFrame.StyledPanel)
         self.resize(100, 100)
@@ -181,10 +185,10 @@ class HistogramFrame(QFrame):
         self._ax.set_xlabel("OoD Score")
         self._ax.grid(True)
 
-        if not os.path.exists(self.settings.metadata_dir):
+        if not os.path.exists(self.settings.metadata_folder):
             return
 
-        ood_file = find_pkl.get_ood_file(self.settings.metadata_dir)
+        ood_file = find_pkl.get_ood_file(self.settings.metadata_folder)
         if not os.path.isfile(ood_file):
             return
         ood_df = pd.read_pickle(ood_file)

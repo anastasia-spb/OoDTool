@@ -16,7 +16,7 @@ def store_result(data_df, distance_mat: np.ndarray):
     return matrix_df
 
 
-def cosine_distances(embeddings_pkl):
+def cosine_distances(embeddings_pkl, output_folder):
     # Read embeddings
     data_df = pd.read_pickle(embeddings_pkl)
     embeddings = data_df[data_types.EmbeddingsType.name()].tolist()
@@ -39,9 +39,11 @@ def cosine_distances(embeddings_pkl):
     print(f"Postprocessing in {postprocessing_time - end_time:0.4f} seconds")
 
     result = store_result(data_df, distance_mat)
-    result.to_pickle('cosine_distances.dist.pkl')
+    output_file = os.path.join(output_folder, 'cosine_distances.dist.pkl')
+    result.to_pickle(output_file)
+    return output_file
 
 
 if __name__ == "__main__":
     input_data = '../../../example_data/tool_working_dir/BalloonsBubbles/TimmResnetWrapper_BalloonsBubbles_1024_230430_001343.emb.pkl'
-    cosine_distances(input_data)
+    cosine_distances(input_data, "./")

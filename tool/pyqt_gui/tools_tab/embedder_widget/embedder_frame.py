@@ -1,6 +1,3 @@
-import os
-from datetime import datetime
-import numpy as np
 import ast
 
 from PyQt5.QtWidgets import (
@@ -13,26 +10,25 @@ from PyQt5.QtWidgets import (
     QLabel,
     QMessageBox,
     QProgressBar,
-    QTextEdit
+    QTextEdit,
+    QCheckBox
 )
 
 from PyQt5.QtCore import Qt
 
-from tool.models.embedderpipeline import EmbedderPipelineThread
-from tool.ood_settings import OoDSettings
-from tool.qt_utils import find_pkl
-
-from tool import data_types
+from tool.pyqt_gui.tools_tab.embedder_widget.embedder_thread import EmbedderPipelineThread
+from tool.pyqt_gui.qt_utils import find_pkl
+from tool.pyqt_gui.paths_settings import PathsSettings
 
 
 class EmbedderFrame(QFrame):
-    def __init__(self, parent, settings: OoDSettings):
+    def __init__(self, parent):
         super(EmbedderFrame, self).__init__(parent)
 
-        self.settings = settings
-
-        self.empty_text = 'Not calculated...'
+        self.settings = PathsSettings()
+        self.empty_text = '...'
         self.embeddings_pkl_file = self.empty_text
+        self.use_cuda = True
 
         self.setFrameShape(QFrame.StyledPanel)
         self.setAttribute(Qt.WA_StyledBackground, True)
@@ -49,6 +45,12 @@ class EmbedderFrame(QFrame):
         self.__select_model_layout()
         self.__add_evaluate_button()
 
+        self.use_cuda_box = QCheckBox("Use cuda")
+        self.use_cuda_box.setChecked(self.use_cuda)
+        self.use_cuda_box.stateChanged.connect(lambda: self.__check_box_state_changed())
+        self.layout.addWidget(self.use_cuda_box)
+
+        self.layout.addStretch()
         self.setLayout(self.layout)
 
     def get_embeddings_pkl_file(self):
@@ -59,13 +61,16 @@ class EmbedderFrame(QFrame):
     def ood_settings_changed(self, settings):
         self.settings = settings
 
+    def __check_box_state_changed(self):
+        self.setting.use_cuda = self.use_cuda_box.isChecked()
+
     def __kwargs_layout(self):
         self.kwargs_hint_line = QLabel('', self)
         self.kwargs_hint_line.setWordWrap(True)
         self.layout.addWidget(self.kwargs_hint_line)
 
         self.kwargs_line = QTextEdit()
-        self.kwargs_line.setMaximumHeight(60)
+        self.kwargs_line.setMaximumHeight(200)
         self.layout.addWidget(self.kwargs_line)
 
     def __select_model_layout(self):
@@ -109,7 +114,7 @@ class EmbedderFrame(QFrame):
         self.embeddings_calc_thread = EmbedderPipelineThread(
             find_pkl.get_metadata_file(self.settings.metadata_folder),
             self.settings.dataset_root_path,
-            self.selected_model, self.settings.use_cuda, **kwargs)
+            self.selected_model, self.use_cuda, **kwargs)
 
         self.embeddings_calc_thread._signal.connect(self.signal_accept)
         self.embeddings_calc_thread.start()
