@@ -73,6 +73,6 @@ class TimmResnetWrapper(IModel):
     def get_batchsize(cls):
         return cls.parameters.batchsize
 
-    def predict(self, img) -> ModelOutput:
+    def predict(self, img, requires_grad) -> dict:
         return self.model(img.to(self.device)).to_dict()
 

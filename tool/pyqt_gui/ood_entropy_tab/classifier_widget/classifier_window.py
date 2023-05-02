@@ -17,7 +17,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal
 
 from tool.core.ood_entropy.ood_score import OoDScore
-from tool.core.classifier_wrappers.classifier_pipeline import ClassifierPipeline, CLASSIFIER_WRAPPERS
+from tool.core.classifier_wrappers.classifier_pipeline import CLASSIFIER_WRAPPERS
+from tool.pyqt_gui.ood_entropy_tab.classifier_widget.classifier_thread import ClassifierThread
 from tool.pyqt_gui.ood_entropy_tab.classifier_widget.classifier_parameters_frame import ClassifierParamsFrame
 from tool.pyqt_gui.paths_settings import PathsSettings
 
@@ -32,8 +33,13 @@ class ClassifierFrame(QFrame):
         self.classifier_output_file = '...'
         self.ood_output = '...'
 
-        default_classifier = list(CLASSIFIER_WRAPPERS.keys())[0]
-        self.classifier = ClassifierPipeline(default_classifier)
+        self.selected_classifier_tag = list(CLASSIFIER_WRAPPERS.keys())[0]
+        self.classifier = ClassifierThread(self.selected_classifier_tag,
+                                           embeddings_files=[],
+                                           output_dir='',
+                                           use_gt_for_training=True,
+                                           probabilities_file=None,
+                                           kwargs=[])
 
         self.setFrameShape(QFrame.StyledPanel)
         self.setAttribute(Qt.WA_StyledBackground, True)
@@ -47,6 +53,7 @@ class ClassifierFrame(QFrame):
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setWidgetResizable(True)
         self.scroll.setWidget(self.classifier_params_widget)
+        self.scroll.setMinimumHeight(400)
         self.layout.addWidget(self.scroll)
 
         self.__add_evaluate_button()
@@ -66,7 +73,13 @@ class ClassifierFrame(QFrame):
         self.layout.insertLayout(0, model_layout)
 
     def __on_model_type_change(self, value):
-        self.classifier = ClassifierPipeline(value)
+        self.selected_classifier_tag = value
+        self.classifier = ClassifierThread(self.selected_classifier_tag,
+                                           embeddings_files=[],
+                                           output_dir='',
+                                           use_gt_for_training=True,
+                                           probabilities_file=None,
+                                           kwargs=[])
         self.classifier_params_widget.reset(self.classifier.input_hint())
 
     def __add_evaluate_button(self):
@@ -106,15 +119,30 @@ class ClassifierFrame(QFrame):
         self.request_selected_embeddings_files_signal.emit()
 
     def process_embeddings_files(self, embeddings_files: list):
-        self.classifier_output_file = self.classifier.run(embeddings_files=embeddings_files,
-                                                          output_dir=self.settings.metadata_folder,
-                                                          use_gt_for_training=True, probabilities_file=None,
-                                                          kwargs=self.classifier_params_widget.get_parameters())
-        self.output_file.setText(self.classifier_output_file)
+        if len(embeddings_files) < 2:
+            self.calculate_embeddings_button.setEnabled(True)
+            return
 
-        if os.path.isfile(self.classifier_output_file):
-            pipeline = OoDScore()
-            self.ood_output = pipeline.run(self.classifier_output_file, self.settings.metadata_folder)
-            self.ood_file_line.setText(self.ood_output)
+        self.classifier = ClassifierThread(classifier_tag=self.selected_classifier_tag,
+                                           embeddings_files=embeddings_files[:-1],
+                                           output_dir=self.settings.metadata_folder,
+                                           use_gt_for_training=(embeddings_files[-1] == "Use GT"),
+                                           probabilities_file=embeddings_files[-1],
+                                           kwargs=self.classifier_params_widget.get_parameters())
+
+        self.classifier._signal.connect(self.signal_accept)
+        self.classifier.start()
+
+    def signal_accept(self, msg):
+        if msg == 0:
+            self.classifier_output_file = self.classifier.get_output_file()
+            self.output_file.setText(self.classifier_output_file)
+
+            if os.path.isfile(self.classifier_output_file):
+                pipeline = OoDScore()
+                self.ood_output = pipeline.run(self.classifier_output_file, self.settings.metadata_folder)
+                self.ood_file_line.setText(self.ood_output)
+        else:
+            QMessageBox.warning(self, "OoDScore", "Failed")
 
         self.calculate_embeddings_button.setEnabled(True)

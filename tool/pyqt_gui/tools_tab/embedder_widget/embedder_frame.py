@@ -50,6 +50,12 @@ class EmbedderFrame(QFrame):
         self.use_cuda_box.stateChanged.connect(lambda: self.__check_box_state_changed())
         self.layout.addWidget(self.use_cuda_box)
 
+        self.requires_grad = False
+        self.requires_grad_box = QCheckBox("Requires grad")
+        self.requires_grad_box.setChecked(self.requires_grad)
+        self.requires_grad_box.stateChanged.connect(lambda: self.__grad_check_box_state_changed())
+        self.layout.addWidget(self.requires_grad_box)
+
         self.layout.addStretch()
         self.setLayout(self.layout)
 
@@ -62,7 +68,10 @@ class EmbedderFrame(QFrame):
         self.settings = settings
 
     def __check_box_state_changed(self):
-        self.setting.use_cuda = self.use_cuda_box.isChecked()
+        self.use_cuda = self.use_cuda_box.isChecked()
+
+    def __grad_check_box_state_changed(self):
+        self.requires_grad = self.requires_grad_box.isChecked()
 
     def __kwargs_layout(self):
         self.kwargs_hint_line = QLabel('', self)
@@ -114,7 +123,7 @@ class EmbedderFrame(QFrame):
         self.embeddings_calc_thread = EmbedderPipelineThread(
             find_pkl.get_metadata_file(self.settings.metadata_folder),
             self.settings.dataset_root_path,
-            self.selected_model, self.use_cuda, **kwargs)
+            self.selected_model, self.use_cuda, self.requires_grad, **kwargs)
 
         self.embeddings_calc_thread._signal.connect(self.signal_accept)
         self.embeddings_calc_thread.start()

@@ -3,9 +3,10 @@ import os
 from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
-    QHBoxLayout, QLabel, QFrame, QCheckBox,
+    QHBoxLayout, QLabel, QFrame, QCheckBox, QComboBox
 )
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSignal
 
 from tool.pyqt_gui.paths_settings import PathsSettings
@@ -20,6 +21,7 @@ class EmbeddingsFilesFrame(QFrame):
         super(EmbeddingsFilesFrame, self).__init__(parent)
         self.settings = PathsSettings()
         self.files = []
+        self.selected_probabilities = ''
         self.checkboxes = []
 
         self.setFrameShape(QFrame.StyledPanel)
@@ -36,7 +38,18 @@ class EmbeddingsFilesFrame(QFrame):
             select_file_box = QCheckBox(file)
             select_file_box.setChecked(True)
             self.checkboxes.append(select_file_box)
-            self.layout.addWidget(self.checkboxes[-1])
+            self.layout.addWidget(self.checkboxes[-1], alignment=Qt.AlignmentFlag.AlignTop)
+
+        text = QLabel("Select file GT for train", self)
+        self.layout.addWidget(text, alignment=Qt.AlignmentFlag.AlignTop)
+
+        models_combobox = QComboBox()
+        models_combobox.currentTextChanged.connect(self.__on_model_type_change)
+        models_combobox.addItems(["Use GT", *self.files])
+        self.layout.addWidget(models_combobox, alignment=Qt.AlignmentFlag.AlignTop)
+
+    def __on_model_type_change(self, value):
+        self.selected_probabilities = value
 
     def clear_layout(self):
         while self.layout.count():
@@ -52,7 +65,9 @@ class EmbeddingsFilesFrame(QFrame):
         return selected_files
 
     def emit_selected_files(self):
-        self.selected_files_signal.emit(self.get_selected_files())
+        selected_files = self.get_selected_files()
+        selected_files.append(self.selected_probabilities)
+        self.selected_files_signal.emit(selected_files)
 
     def __get_all_embeddings_files(self):
         self.files = []

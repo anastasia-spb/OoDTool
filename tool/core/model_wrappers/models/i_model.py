@@ -43,7 +43,7 @@ class IModel(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def predict(self, img) -> ModelOutput:
+    def predict(self, img, requires_grad) -> dict:
         pass
 
     @classmethod

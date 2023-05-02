@@ -18,7 +18,7 @@ from tool.core.model_wrappers.models.alexnet.alexnet_wrapper import AlexNetWrapp
 
 BATCHSIZE = 128
 CLASSES = 2
-EPOCHS = 20
+EPOCHS = 100
 
 
 def load_and_run(weights_path, model_labels):
@@ -46,9 +46,9 @@ def load_and_run(weights_path, model_labels):
 
 
 def train_and_test():
-    data_dir = '/home/nastya/Desktop/OoDTool/example_data/datasets'
+    data_dir = '/home/vlasova/datasets/Summer2Winter'
     metadata_file = \
-        '/home/nastya/Desktop/OoDTool/example_data/tool_working_dir/BalloonsBubbles/BalloonsBubbles.meta.pkl'
+        '/home/vlasova/datasets/Summer2Winter/oodsession_0/SummerWinter.meta.pkl'
 
     # Cuda maintenance
     gc.collect()
@@ -56,11 +56,11 @@ def train_and_test():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Generate the model.
-    dropout = 0.4
+    dropout = 0.302216249
     model = AlexNet(CLASSES, dropout).to(device)
 
-    optimizer_name = "RMSprop"  # Adam
-    lr = 4.8e-05
+    optimizer_name = "Adam"  # Adam
+    lr = 0.0001741036869433721
     optimizer = getattr(optim, optimizer_name)(model.parameters(), lr=lr)
 
     image_transformation = AlexNetTransforms()
@@ -107,6 +107,6 @@ def show_metrics(y_actual, y_preds):
 
 
 if __name__ == "__main__":
-    # train_and_test()
-    load_and_run('/home/nastya/Desktop/OoDTool/pretrained_weights/embedders/AlexNet_BalloonsBubbles.pth',
-                 ["bubble", "balloon"])
+    train_and_test()
+    # load_and_run('/home/nastya/Desktop/OoDTool/pretrained_weights/embedders/AlexNet_BalloonsBubbles.pth',
+    #             ["bubble", "balloon"])

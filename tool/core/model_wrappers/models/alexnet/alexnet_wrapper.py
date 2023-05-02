@@ -1,5 +1,5 @@
 import torch
-
+import torch.nn.functional as F
 from tool.core.model_wrappers.models.i_model import IModel, ModelOutput
 from tool.core.model_wrappers.models.alexnet.alexnet_module import AlexNet, AlexNetTransforms
 
@@ -7,8 +7,8 @@ from tool.core.model_wrappers.models.alexnet.alexnet_module import AlexNet, Alex
 class AlexNetWrapperParameters:
     def __init__(self):
         self.weights_path = './pretrained_weights/embedders/alexnet_SummerWinter.pth'
-        self.model_labels = '[Summer, Winter]'
-        self.dropout = 0.41
+        self.model_labels = 'Summer, Winter'
+        self.dropout = 0.30221624
         self.batchsize = 16
 
 
@@ -22,6 +22,7 @@ class AlexNetWrapper(IModel):
         labels_list = self.parameters.model_labels.split(", ")
         self.idx_to_label = {i: labels_list[i] for i in range(len(labels_list))}
         self.device = device
+        self.num_classes = len(labels_list)
         self.model = AlexNet(num_classes=len(labels_list), dropout=self.parameters.dropout).to(device)
         self.model.load_state_dict(torch.load(self.parameters.weights_path))
         self.model.eval()
@@ -49,8 +50,9 @@ class AlexNetWrapper(IModel):
         return "{{'weights_path' : '{0}', 'model_labels' : '{1}' }}".format(cls.parameters.weights_path,
                                                                             cls.parameters.model_labels)
 
-    def predict(self, img) -> ModelOutput:
+    def predict(self, img, requires_grad) -> dict:
         embeddings = []
+        img.requires_grad = requires_grad
 
         def copy_embeddings(m, i, o):
             embedding = o[:, :, 0, 0]
@@ -60,5 +62,10 @@ class AlexNetWrapper(IModel):
         _ = layer.register_forward_hook(copy_embeddings)
         prediction = self.model(img.to(self.device))
 
+        inputs = torch.argmax(prediction, dim=1)
+        one_hot_encoding = F.one_hot(torch.tensor(inputs), num_classes=self.num_classes).to(self.device)
+        prediction.backward(gradient=one_hot_encoding)
+
         return ModelOutput(embeddings=embeddings[0].detach().cpu(),
-                           probabilities=prediction.detach().cpu()).to_dict()
+                           probabilities=prediction.detach().cpu(),
+                           grads=img.grad.detach().cpu()).to_dict()

@@ -1,8 +1,12 @@
 import os
+from tqdm import tqdm
+import gc
 import time
 import pandas as pd
 import numpy as np
 from scipy.spatial import distance
+import torch
+from torch.nn import functional as F
 
 from tool.core import data_types
 
@@ -21,9 +25,9 @@ class DistanceCalculator:
 
     def run(self):
         if self.method_name == 'cosine':
-            self.__cosine_distance()
+            self.distance_mat = self.__pdist_distance(metric='cosine')
         elif self.method_name == 'euclidian':
-            self.__euclidian_distance()
+            self.distance_mat = self.__minkowski_distance()
         self.output_file = self.__store(self.output_folder)
 
     def get_output_file(self):
@@ -36,28 +40,46 @@ class DistanceCalculator:
         self.relative_paths = data_df[data_types.RelativePathType.name()].tolist()
         return np.array(embeddings, dtype=np.dtype('float64'))
 
-    def __euclidian_distance(self):
-        m = self.data.shape[0]
-        self.distance_mat = np.zeros(shape=(m, m))
+    def __minkowski_distance(self):
+        # Cuda maintenance
+        gc.collect()
+        torch.cuda.empty_cache()
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    def __cosine_distance(self):
-        # Calculate cosine distance
-        m = self.data.shape[0]
-        self.distance_mat = np.zeros(shape=(m, m))
+        n = self.data.shape[0]
+        distance_mat = torch.from_numpy(np.zeros(shape=(n, n)))
+        torch_data = torch.from_numpy(self.data).to(device, non_blocking=True)
 
         start_time = time.perf_counter()
-        condensed_distance_matrix = distance.pdist(self.data, 'cosine')
+        for i in tqdm(range(n)):
+            for j in range(i + 1, n):
+                distance_mat[i, j] = torch.nn.functional.pairwise_distance(torch_data[i, :], torch_data[j, :])
+                distance_mat[j, i] = distance_mat[i, j]
+        end_time = time.perf_counter()
+        print(f"Distances calculated in {end_time - start_time:0.4f} seconds")
+
+        return distance_mat.detach().cpu()
+
+    def __pdist_distance(self, metric='cosine'):
+        # Calculate cosine distance
+        m = self.data.shape[0]
+        distance_mat = np.zeros(shape=(m, m))
+
+        start_time = time.perf_counter()
+        condensed_distance_matrix = distance.pdist(self.data, metric)
         end_time = time.perf_counter()
         print(f"Cosine distances calculated in {end_time - start_time:0.4f} seconds")
 
         for i in range(m):
             for j in range(i + 1, m):
                 idx = m * i + j - ((i + 2) * (i + 1)) // 2
-                self.distance_mat[i, j] = condensed_distance_matrix[idx]
-                self.distance_mat[j, i] = condensed_distance_matrix[idx]
+                distance_mat[i, j] = condensed_distance_matrix[idx]
+                distance_mat[j, i] = condensed_distance_matrix[idx]
 
         postprocessing_time = time.perf_counter()
         print(f"Postprocessing in {postprocessing_time - end_time:0.4f} seconds")
+
+        return distance_mat
 
     @classmethod
     def __store_result(cls, relative_paths, distance_mat: np.ndarray):
@@ -75,9 +97,22 @@ class DistanceCalculator:
         return output_file
 
 
-if __name__ == "__main__":
-    input_data = '../../../example_data/tool_working_dir/BalloonsBubbles/TimmResnetWrapper_BalloonsBubbles_1024_230430_001343.emb.pkl'
+def test_cosine(input_data):
     calculator = DistanceCalculator(method_name='cosine',
                                     embeddings_pkl=input_data,
                                     output_folder="./")
     calculator.run()
+
+
+def test_euclidean(input_data):
+    calculator = DistanceCalculator(method_name='euclidian',
+                                    embeddings_pkl=input_data,
+                                    output_folder="./")
+    calculator.run()
+
+
+if __name__ == "__main__":
+    # test_data = '../../../example_data/tool_working_dir/BalloonsBubbles/TimmResnetWrapper_BalloonsBubbles_1024_230430_001343.emb.pkl'
+    test_data = '/home/vlasova/datasets/TrafficLightsDVC/oodsession_0/RegnetWrapper_CarLightsDVC_784_230502_115123.emb.pkl'
+    # test_cosine(test_data)
+    test_euclidean(test_data)

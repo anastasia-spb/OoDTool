@@ -59,7 +59,7 @@ class RegnetWrapper(IModel):
     def backward(self, one_hot_target):
         pass
 
-    def predict(self, img) -> ModelOutput:
+    def predict(self, img, requires_grad) -> dict:
         embeddings = []
 
         def copy_embeddings(m, o):

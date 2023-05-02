@@ -23,8 +23,8 @@ def test(test_data: test_data_type.TestData):
         os.makedirs(metadata_folder)
 
     clf = classifier_pipeline.ClassifierPipeline(test_data.classifier_tag)
-    _ = clf.run(test_data.embeddings_pkl, metadata_folder, test_data.use_gt,
-                test_data.pkl_with_probabilities, test_data.kwargs)
+    _ = clf.classify(test_data.embeddings_pkl, metadata_folder, test_data.use_gt,
+                     test_data.pkl_with_probabilities, test_data.kwargs)
     predictions_df = clf.get_probabilities_df()
 
     predictions_columns = data_helpers.get_columns_which_start_with(predictions_df,

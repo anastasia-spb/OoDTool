@@ -19,6 +19,10 @@ class ClassifierPipeline:
     def __init__(self, classifier_tag: str):
         self.probabilities_df = pd.DataFrame()
         self.classifier = CLASSIFIER_WRAPPERS[classifier_tag]()
+        self.output_file = ''
+
+    def get_output_file(self):
+        return self.output_file
 
     def input_hint(self):
         return self.classifier.input_hint()
@@ -69,13 +73,14 @@ class ClassifierPipeline:
         name = "".join((self.classifier.tag, "_", timestamp_str, '.clf.pkl'))
         file = os.path.join(output_folder, name)
         self.probabilities_df.to_pickle(file)
+        self.output_file = file
         return file
 
     def get_probabilities_df(self) -> pd.DataFrame:
         return self.probabilities_df
 
-    def run(self, embeddings_files: List[str], output_dir: str, use_gt_for_training: bool,
-            probabilities_file: Optional[str], kwargs: List[dict]) -> str:
+    def classify(self, embeddings_files: List[str], output_dir: str, use_gt_for_training: bool,
+                 probabilities_file: Optional[str], kwargs: List[dict]) -> str:
         """Walks through dataset directory and stores metadata information about images into <dataset_name>.meta.pkl file.
             Args:
                 embeddings_files: List of all files with embeddings
