@@ -37,7 +37,7 @@ class ClassifierParamsFrame(QWidget):
         outer_frame_layout = QVBoxLayout()
         close_button_layout = QHBoxLayout()
         close_button = QPushButton()
-        close_button.setIcon(QIcon("tool/pyqt_gui/gui_graphics/close.png"))
+        close_button.setIcon(QIcon("gui_graphics/close.png"))
         close_button.clicked.connect(lambda: self.__delete_frame(unique_id))
         close_button_layout.addWidget(close_button, alignment=Qt.AlignmentFlag.AlignRight)
         outer_frame_layout.addLayout(close_button_layout)

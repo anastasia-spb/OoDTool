@@ -15,7 +15,7 @@ from tool.core.model_wrappers.models.alexnet.alexnet_module import AlexNet, Alex
 from tool.core.model_wrappers.models.alexnet.train_and_test.utils import epoch_train
 from tool.core.model_wrappers.models.utils.jpeg_dataset import JpegTrainDataset
 
-DATA_ROOT_DIR = '/home/nastya/Desktop/OoDTool/example_data/datasets'
+DATA_ROOT_DIR = '/home/nastya/Desktop/OoDTool/example_data/datasets/BalloonsBubbles'
 METADATA_FILE = '/home/nastya/Desktop/OoDTool/example_data/tool_working_dir/BalloonsBubbles/BalloonsBubbles.meta.pkl'
 BATCHSIZE = 64
 CLASSES = 2

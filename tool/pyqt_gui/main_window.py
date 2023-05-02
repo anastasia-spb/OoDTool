@@ -43,7 +43,7 @@ class App(QMainWindow):
         """Constructor."""
         super(App, self).__init__()
         self.setWindowTitle("OoD Tool")
-        self.setWindowIcon(QIcon('tool/pyqt_gui/gui_graphics/ood_logo.png'))
+        self.setWindowIcon(QIcon('gui_graphics/ood_logo.png'))
 
         widget = AppWidgets(self)
         widget.setMinimumWidth(1000)

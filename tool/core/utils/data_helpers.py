@@ -36,7 +36,7 @@ def get_labels(data_df: pd.DataFrame) -> List[str]:
     return data_df[data_types.LabelsType.name()][0]
 
 
-def get_predictions(probabilities_file: str) -> np.ndarray[int]:
+def get_predictions(probabilities_file: str) -> np.ndarray:
     data_df = pd.read_pickle(probabilities_file)
     probabilities = data_df[data_types.ClassProbabilitiesType.name()].tolist()
     return np.argmax(probabilities, axis=1)

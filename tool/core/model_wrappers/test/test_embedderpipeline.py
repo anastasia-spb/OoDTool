@@ -58,29 +58,31 @@ def test(test_data: TestData, store_embeddings: bool):
         model_output_df.to_pickle(''.join((test_data.embedder_name, '_', 'test_pipeline.emb.pkl')))
 
 
-DATASET_ROOT = '../../../../example_data/datasets'
+BUBBLE_BALLOONS_DATASET_ROOT = '../../../../example_data/datasets/BalloonsBubbles'
 WORKING_DIR = '../../../../example_data/tool_working_dir'
 
-ALEXNET_TEST_PARAMS = TestData(DATASET_ROOT,
+ALEXNET_TEST_PARAMS = TestData(BUBBLE_BALLOONS_DATASET_ROOT,
                                os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
                                AlexNetWrapper.get_name(),
                                {"weights_path": '../../../../pretrained_weights/embedders/AlexNet_BalloonsBubbles.pth',
                                 "model_labels": "[bubble, balloon]"},
                                0.63)
 
-TIMM_DENSNET_TEST_PARAMS = TestData(DATASET_ROOT,
+TIMM_DENSNET_TEST_PARAMS = TestData(BUBBLE_BALLOONS_DATASET_ROOT,
                                     os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
                                     TimmResnetWrapper.get_name(),
                                     {"model_checkpoint": 'densenet121'},
                                     0.68)
 
-TIMM_RESNET_TEST_PARAMS = TestData(DATASET_ROOT,
+TIMM_RESNET_TEST_PARAMS = TestData(BUBBLE_BALLOONS_DATASET_ROOT,
                                    os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
                                    TimmResnetWrapper.get_name(),
                                    {"model_checkpoint": 'resnet34'},
                                    0.68)
 
-TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DATASET_ROOT,
+DOGS_CATS_DATASET_ROOT = '../../../../example_data/datasets/DogsCats'
+
+TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DOGS_CATS_DATASET_ROOT,
                                                       os.path.join(WORKING_DIR, 'DogsCats/DogsCats.meta.pkl'),
                                                       TimmResnetWrapper.get_name(),
                                                       {"model_checkpoint": 'resnet34'},
@@ -89,8 +91,8 @@ TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DATASET_ROOT,
 
 def test_pipeline(store_embeddings: bool):
     testdata = [
-        ALEXNET_TEST_PARAMS,
-        # TIMM_DENSNET_TEST_PARAMS,
+        # ALEXNET_TEST_PARAMS,
+        TIMM_DENSNET_TEST_PARAMS,
         # TIMM_RESNET_TEST_PARAMS,
         # TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS,
     ]

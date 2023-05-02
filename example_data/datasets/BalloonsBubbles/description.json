@@ -1,6 +1,9 @@
 {
   "Dataset":
     {
+        "name": "BalloonsBubbles",
+        "labels": ["bubble", "balloon"],
+        "notes": "This dataset contains labels from ImageNet (971 and 417)",
         "folders": [
         {
           "path": "balloon/test",

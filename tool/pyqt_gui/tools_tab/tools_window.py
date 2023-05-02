@@ -20,7 +20,7 @@ class LogoFrame(QWidget):
         self.layout = QHBoxLayout()
 
         label = QLabel(self)
-        pixmap = QPixmap('tool/pyqt_gui/gui_graphics/ood_logo_v3_small.png')
+        pixmap = QPixmap('gui_graphics/ood_logo_v3_small.png')
         pixmap.scaledToHeight(60)
         label.setPixmap(pixmap)
         label.resize(pixmap.width(),
@@ -42,7 +42,7 @@ class ToolsWindow(QWidget):
         logo_frame = LogoFrame(self)
         self.upper_layout.addWidget(logo_frame)
 
-        self.common_settings_frame = PathsSettingsFrame(self)
+        self.common_settings_frame = PathsSettingsFrame(self, create_new_folder=True)
         self.upper_layout.addWidget(self.common_settings_frame)
         self.layout.addLayout(self.upper_layout)
 

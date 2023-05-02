@@ -1,6 +1,8 @@
 {
   "Dataset":
     {
+        "name": "DogsCats",
+        "labels": ["Dog", "Cat"],
         "folders": [
         {
           "path": "cats",

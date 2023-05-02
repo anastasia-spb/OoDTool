@@ -4,10 +4,11 @@ import pandas as pd
 from tool.core import data_types
 
 
-def parse_dataset_description(description_json: str, dataset_folder, dataset_labels):
+def parse_dataset_description(description_json: str):
     with open(description_json, 'r') as json_file:
         dataset_description = json.load(json_file)
     dataset_data = dataset_description["Dataset"]
+    dataset_labels = dataset_data["labels"]
     root, _ = os.path.split(description_json)
     samples = []
     for folder in dataset_data["folders"]:
@@ -19,30 +20,15 @@ def parse_dataset_description(description_json: str, dataset_folder, dataset_lab
                     continue
                 rel_path = os.path.relpath(os.path.join(root_dir, name), images_path)
                 samples.append(data_types.MetadataSampleType(
-                    data_types.RelativePathType(os.path.join(dataset_folder, folder["path"], rel_path)),
+                    data_types.RelativePathType(os.path.join(folder["path"], rel_path)),
                     data_types.LabelsType(dataset_labels),
                     data_types.TestSampleFlagType(folder["test"]),
                     data_types.LabelType(folder["label"])))
-    return pd.DataFrame.from_records([s.to_dict() for s in samples])
+    return pd.DataFrame.from_records([s.to_dict() for s in samples]), dataset_data["name"]
 
 
-def parse_dataset(root, dataset):
-    samples = []
-    for description in dataset["descriptions"]:
-        path_file = os.path.split(description)
-        samples.append(parse_dataset_description(os.path.join(root, description), path_file[0], dataset["labels"]))
-    return pd.concat(samples, ignore_index=True, sort=False)
-
-
-def parse_datasets(datasets_description, dataset_name):
-    with open(datasets_description, 'r') as json_file:
-        datasets_data = json.load(json_file)
-
-    root, _ = os.path.split(datasets_description)
-    for dataset in datasets_data["Datasets"]:
-        if dataset["name"] == dataset_name:
-            return parse_dataset(root, dataset)
-    return None
+def parse_dataset(description_json):
+    return parse_dataset_description(description_json)
 
 
 

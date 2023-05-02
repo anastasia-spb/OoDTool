@@ -23,7 +23,7 @@ def get_dir_layout(callback_fn, output_dir_line, label, default_dir, parent):
 
     output_dir_layout = QHBoxLayout()
     select_dir_button = QPushButton()
-    select_dir_button.setIcon(QIcon("tool/gui_graphics/select.png"))
+    select_dir_button.setIcon(QIcon("gui_graphics/select.png"))
 
     output_dir_line.setEnabled(False)
     output_dir_line.setText(default_dir)

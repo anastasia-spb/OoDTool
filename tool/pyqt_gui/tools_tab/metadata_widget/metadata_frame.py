@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
 
 from PyQt5.QtCore import Qt, QAbstractTableModel, pyqtSignal
 
-from tool.core.metadata_generator.generator import generate_metadata, get_datasets_names
+from tool.core.metadata_generator.generator import generate_metadata
 from tool.pyqt_gui.paths_settings import PathsSettings
 from tool.core.data_types import types
 
@@ -80,19 +80,26 @@ class MetadataFrame(QFrame):
         self.layout.addWidget(self.datasets_combobox)
 
     def __get_json_file(self):
-        self.dataset_description_json_file = os.path.join(self.settings.dataset_root_path, "datasets.json")
+        if not os.path.exists(self.settings.dataset_root_path):
+            return
+
+        description_files = []
+        for file in os.listdir(self.settings.dataset_root_path):
+            if file.endswith(".json"):
+                description_files.append(file)
+
+        if len(description_files) == 0:
+            return
+
+        self.datasets_combobox.clear()
+        self.datasets_combobox.addItems(description_files)
+        self.datasets_combobox.setCurrentText(self.dataset_name)
+
+        self.dataset_description_json_file = os.path.join(self.settings.dataset_root_path, description_files[0])
         if not os.path.isfile(self.dataset_description_json_file):
             return
 
         self.json_file_line.setText(self.dataset_description_json_file)
-        try:
-            names = get_datasets_names(self.dataset_description_json_file)
-        except KeyError:
-            QMessageBox.warning(self, "", "Wrong json format")
-            return
-        self.datasets_combobox.clear()
-        self.datasets_combobox.addItems(names)
-        self.datasets_combobox.setCurrentText(self.dataset_name)
 
     def __on_datasets_combobox_values_change(self, value):
         self.dataset_name = value
@@ -108,7 +115,6 @@ class MetadataFrame(QFrame):
         self.generate_button.setEnabled(False)
         try:
             self.metadata_file = generate_metadata(self.dataset_description_json_file,
-                                                   self.dataset_name,
                                                    self.settings.metadata_folder)
         except Exception as error:
             print(error)

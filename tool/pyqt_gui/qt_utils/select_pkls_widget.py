@@ -38,7 +38,7 @@ class ProbabilitiesFromPickleFrame(QWidget):
 
         probabilities_pkl_layout = QHBoxLayout()
         select_pkl_file_button = QPushButton()
-        select_pkl_file_button.setIcon(QIcon("tool/gui_graphics/select.png"))
+        select_pkl_file_button.setIcon(QIcon("gui_graphics/select.png"))
         self.pkl_probabilities_file_line = QLineEdit()
         self.pkl_probabilities_file_line.setEnabled(False)
         select_pkl_file_button.clicked.connect(self.__get_probabilities_pkl_file)
