@@ -4,10 +4,11 @@ from PyQt5.QtWidgets import (
     QFrame,
     QLineEdit,
     QComboBox,
-    QLabel
+    QLabel,
+    QMessageBox
 )
 
-from tool.core.data_projectors.data_projector import DataProjector
+from tool.pyqt_gui.tools_tab.projector_widget.projector_thread import DataProjectorThread
 from tool.pyqt_gui.paths_settings import PathsSettings
 from tool.pyqt_gui.qt_utils import find_pkl
 
@@ -21,7 +22,7 @@ class ProjectorFrame(QFrame):
         self.settings = PathsSettings()
 
         self.output_file = ''
-        self.selected_method = DataProjector.method_name
+        self.selected_method = DataProjectorThread.method_name
 
         self.setFrameShape(QFrame.StyledPanel)
         self.setMaximumHeight(200)
@@ -58,7 +59,7 @@ class ProjectorFrame(QFrame):
     def __embeddings_selection_layout(self):
         self.datasets_combobox = QComboBox()
         self.datasets_combobox.textActivated.connect(self.__on_datasets_combobox_values_change)
-        self.datasets_combobox.addItems(DataProjector.methods)
+        self.datasets_combobox.addItems(DataProjectorThread.methods)
         self.layout.addWidget(self.datasets_combobox)
 
     def __on_datasets_combobox_values_change(self, value):
@@ -72,8 +73,18 @@ class ProjectorFrame(QFrame):
 
     def __fit_embeddings(self):
         self.generate_button.setEnabled(False)
-        projector = DataProjector(self.selected_method)
-        self.output_file = projector.project(metadata_folder=self.settings.metadata_folder,
-                                             embeddings_file=find_pkl.get_embeddings_file(self.settings.metadata_folder))
-        self.output_file_line.setText(self.output_file)
+
+        self.projector_thread = DataProjectorThread(self.selected_method, metadata_folder=self.settings.metadata_folder,
+                                                    embeddings_file=find_pkl.get_embeddings_file(
+                                                        self.settings.metadata_folder))
+
+        self.projector_thread._signal.connect(self.signal_accept)
+        self.projector_thread.start()
+
+    def signal_accept(self, msg):
+        if msg == 0:
+            self.output_file_line.setText(self.projector_thread.get_output_file())
+        else:
+            QMessageBox.warning(self, "DataProjector", "Failed to project")
+
         self.generate_button.setEnabled(True)

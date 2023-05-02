@@ -1,4 +1,3 @@
 {
-    "dataset_root_path": "/home/nastya/Desktop/OoDTool/example_data/datasets",
-    "metadata_folder": "/home/nastya/Desktop/OoDTool/example_data/tool_working_dir/tmp"
+    "dataset_root_path": "/home/vlasova/datasets/TrafficLightsDVC"
 }

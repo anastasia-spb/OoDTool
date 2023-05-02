@@ -20,6 +20,7 @@ class DataProjector:
         self.projector = None
         self.method_name = method_name
         self.projected_data = None
+        self.output_file = ''
         if method_name == "tsne":
             self.projector = TSNE(n_components=2, perplexity=30.0, n_iter=2000, learning_rate=10.0,
                                   random_state=42, verbose=verbose)
@@ -48,9 +49,12 @@ class DataProjector:
 
         timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
         name = "".join((self.method_name, "_", timestamp_str, ".2emb.pkl"))
-        output_file = os.path.join(metadata_folder, name)
-        data_df.to_pickle(output_file)
-        return output_file
+        self.output_file = os.path.join(metadata_folder, name)
+        data_df.to_pickle(self.output_file)
+        return self.output_file
+
+    def get_output_file(self):
+        return self.output_file
 
 
 

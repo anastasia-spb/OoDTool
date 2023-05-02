@@ -1,0 +1,3 @@
+[submodule "tool/core/model_wrappers/models/regnet/catalyst-classification"]
+	path = tool/core/model_wrappers/models/regnet/catalyst-classification
+	url = ssh://git@gitlab.cognitivepilot.com:8022/ml/dl-pipelines/catalyst-classification.git

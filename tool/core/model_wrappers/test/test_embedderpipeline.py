@@ -9,6 +9,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 
 from tool.core.model_wrappers.models.alexnet.alexnet_wrapper import AlexNetWrapper
 from tool.core.model_wrappers.models.timm_resnet.timm_resnet_wrapper import TimmResnetWrapper
+from tool.core.model_wrappers.models.regnet.regnet_wrapper import RegnetWrapper
 from tool.core.model_wrappers.embedder_pipeline import EmbedderPipeline
 from tool.core import data_types
 
@@ -87,7 +88,6 @@ TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DOGS_CATS_DATASET_ROOT,
                                                       TimmResnetWrapper.get_name(),
                                                       {"model_checkpoint": 'resnet34'},
                                                       0.46)
-
 
 def test_pipeline(store_embeddings: bool):
     testdata = [

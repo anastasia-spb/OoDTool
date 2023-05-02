@@ -20,7 +20,7 @@ class LogoFrame(QWidget):
         self.layout = QHBoxLayout()
 
         label = QLabel(self)
-        pixmap = QPixmap('gui_graphics/ood_logo_v3_small.png')
+        pixmap = QPixmap('tool/pyqt_gui/gui_graphics/ood_logo_v3_small.png')
         pixmap.scaledToHeight(60)
         label.setPixmap(pixmap)
         label.resize(pixmap.width(),

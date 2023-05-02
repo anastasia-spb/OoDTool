@@ -14,9 +14,11 @@ from tool.core.data_types import types
 
 from tool.core.model_wrappers.models.alexnet.alexnet_wrapper import AlexNetWrapper
 from tool.core.model_wrappers.models.timm_resnet.timm_resnet_wrapper import TimmResnetWrapper
+from tool.core.model_wrappers.models.regnet.regnet_wrapper import RegnetWrapper
 
 MODEL_WRAPPERS = {AlexNetWrapper.get_name(): AlexNetWrapper,
-                  TimmResnetWrapper.get_name(): TimmResnetWrapper}
+                  TimmResnetWrapper.get_name(): TimmResnetWrapper,
+                  RegnetWrapper.get_name(): RegnetWrapper}
 
 
 class EmbedderPipeline:

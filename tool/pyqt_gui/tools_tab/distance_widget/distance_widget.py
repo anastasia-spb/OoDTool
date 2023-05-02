@@ -3,10 +3,10 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QFrame,
     QLineEdit,
-    QLabel
+    QLabel, QComboBox, QMessageBox
 )
 
-from tool.core.distance_wrapper.calculate_distances import cosine_distances
+from tool.pyqt_gui.tools_tab.distance_widget.distance_thread import DistanceThread
 from tool.pyqt_gui.paths_settings import PathsSettings
 from tool.pyqt_gui.qt_utils import find_pkl
 
@@ -20,6 +20,7 @@ class DistanceFrame(QFrame):
         self.settings = PathsSettings()
 
         self.output_file = ''
+        self.selected_method = DistanceThread.method_name
 
         self.setFrameShape(QFrame.StyledPanel)
         self.setMaximumHeight(200)
@@ -32,6 +33,8 @@ class DistanceFrame(QFrame):
         text.setFont(font)
         self.layout.addWidget(text)
 
+        self.__embeddings_selection_layout()
+        self.layout.addSpacing(spacing_between_layouts)
         self.__add_generate_metadata_button()
         self.layout.addSpacing(spacing_between_layouts)
 
@@ -59,7 +62,27 @@ class DistanceFrame(QFrame):
 
     def __fit_embeddings(self):
         self.generate_button.setEnabled(False)
-        self.output_file = cosine_distances(find_pkl.get_embeddings_file(self.settings.metadata_folder),
-                                            self.settings.metadata_folder)
-        self.output_file_line.setText(self.output_file)
+
+        self.projector_thread = DistanceThread(method_name=self.selected_method,
+                                               embeddings_pkl=find_pkl.get_embeddings_file(self.settings.metadata_folder),
+                                               output_folder=self.settings.metadata_folder)
+
+        self.projector_thread._signal.connect(self.signal_accept)
+        self.projector_thread.start()
+
+    def signal_accept(self, msg):
+        if msg == 0:
+            self.output_file_line.setText(self.projector_thread.get_output_file())
+        else:
+            QMessageBox.warning(self, "DistanceCalculation", "Failed")
+
         self.generate_button.setEnabled(True)
+
+    def __embeddings_selection_layout(self):
+        self.datasets_combobox = QComboBox()
+        self.datasets_combobox.textActivated.connect(self.__on_datasets_combobox_values_change)
+        self.datasets_combobox.addItems(DistanceThread.methods)
+        self.layout.addWidget(self.datasets_combobox)
+
+    def __on_datasets_combobox_values_change(self, value):
+        self.selected_method = value
