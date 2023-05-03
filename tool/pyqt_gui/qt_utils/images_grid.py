@@ -2,7 +2,6 @@ import os
 import math
 import numpy as np
 
-
 from PyQt5.QtWidgets import (
     QPushButton,
     QGridLayout, QWidget
@@ -10,9 +9,12 @@ from PyQt5.QtWidgets import (
 
 from PyQt5.QtCore import Qt, QPoint, QSize
 from PyQt5.QtGui import QPixmap, QPainter, QIcon, QColor
+from PIL.ImageQt import ImageQt
 
 from tool.pyqt_gui.qt_utils.qt_types import ImageInfo
 from typing import Optional, List
+
+from tool.pyqt_gui.qt_utils.saliency_map_utils.overlay_map import overlay_map
 
 
 class ImagesGrid(QWidget):
@@ -84,3 +86,21 @@ class ImagesGrid(QWidget):
         show_image_window = ImageWindow(self)
         show_image_window.show_image(img_meta)
         show_image_window.show()
+
+        self.__show_grad(img_meta)
+
+    def __show_grad(self, img_meta):
+        from tool.pyqt_gui.qt_utils.helpers import SimpleImageWindow
+
+        grads_folder = os.path.join(img_meta.metadata_dir, "grads")
+        if os.path.exists(grads_folder):
+            grads_array_file = os.path.join(grads_folder, "".join((img_meta.relative_path, ".grads.npy")))
+            if os.path.isfile(grads_array_file):
+                try:
+                    img_map = overlay_map(os.path.join(img_meta.absolute_path, img_meta.relative_path),
+                                          grads_array_file)
+                    simple_image_window = SimpleImageWindow("Gradient", self)
+                    simple_image_window.show_image(ImageQt(img_map))
+                    simple_image_window.show()
+                except:
+                    pass

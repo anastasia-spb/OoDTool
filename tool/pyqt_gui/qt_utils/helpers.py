@@ -93,3 +93,21 @@ class ImageWindow(QMainWindow):
 
     def show_image(self, image_info):
         self.image_widget.show_image(image_info)
+
+
+class SimpleImageWindow(QMainWindow):
+    def __init__(self, title, parent=None):
+        super(SimpleImageWindow, self).__init__(parent)
+
+        self.image_label = QLabel(self)
+        self.setCentralWidget(self.image_label)
+        self.setWindowTitle(title)
+
+    def show_image(self, img):
+        pix = QPixmap.fromImage(img)
+        if (pix.width() >= pix.height()) and (pix.width() > 800):
+            pix = pix.scaledToWidth(800)
+        elif (pix.height() > pix.width()) and (pix.height() > 800):
+            pix = pix.scaledToHeight(800)
+        self.image_label.setPixmap(pix)
+

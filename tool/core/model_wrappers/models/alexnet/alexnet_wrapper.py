@@ -63,9 +63,13 @@ class AlexNetWrapper(IModel):
         prediction = self.model(img.to(self.device))
 
         inputs = torch.argmax(prediction, dim=1)
-        one_hot_encoding = F.one_hot(torch.tensor(inputs), num_classes=self.num_classes).to(self.device)
-        prediction.backward(gradient=one_hot_encoding)
+
+        grads = None
+        if requires_grad:
+            one_hot_encoding = F.one_hot(torch.tensor(inputs), num_classes=self.num_classes).to(self.device)
+            prediction.backward(gradient=one_hot_encoding)
+            grads = img.grad.detach().cpu()
 
         return ModelOutput(embeddings=embeddings[0].detach().cpu(),
                            probabilities=prediction.detach().cpu(),
-                           grads=img.grad.detach().cpu()).to_dict()
+                           grads=grads).to_dict()

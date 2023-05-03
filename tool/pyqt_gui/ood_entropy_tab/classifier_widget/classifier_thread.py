@@ -6,7 +6,7 @@ from tool.core.classifier_wrappers.classifier_pipeline import ClassifierPipeline
 
 
 class ClassifierThread(QThread, ClassifierPipeline):
-    _signal = pyqtSignal(int)
+    _signal = pyqtSignal(list)
 
     # constructor
     def __init__(self, classifier_tag, embeddings_files: List[str], output_dir: str, use_gt_for_training: bool,
@@ -20,12 +20,13 @@ class ClassifierThread(QThread, ClassifierPipeline):
 
     def run(self):
         try:
-            super(ClassifierThread, self).classify(embeddings_files=self.embeddings_files,
-                                                   output_dir=self.output_dir,
-                                                   use_gt_for_training=self.use_gt_for_training,
-                                                   probabilities_file=self.probabilities_file,
-                                                   kwargs=self.kwargs)
-            self._signal.emit(0)
+            results = super(ClassifierThread, self).train_and_classify(
+                embeddings_files=self.embeddings_files,
+                output_dir=self.output_dir,
+                use_gt_for_training=self.use_gt_for_training,
+                probabilities_file=self.probabilities_file,
+                kwargs=self.kwargs)
+            self._signal.emit(results)
         except Exception as error:
             print(str(error))
-            self._signal.emit(1)
+            self._signal.emit([])

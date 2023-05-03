@@ -9,25 +9,18 @@ def get_columns_which_start_with(df, column: str) -> List[str]:
     return [col for col in df.columns if col.startswith(column)]
 
 
-def merge_data_files(files: List[str], column: str) -> (pd.DataFrame, List[str]):
+def merge_data_files(files: List[str]) -> (pd.DataFrame, List[str]):
     united_df = pd.DataFrame()
     for i, file in enumerate(files):
         df = pd.read_pickle(file)
         if united_df.empty:
-            united_df[data_types.RelativePathType.name()] = df[data_types.RelativePathType.name()]
-            united_df[data_types.LabelsType.name()] = df[data_types.LabelsType.name()]
-            united_df[data_types.TestSampleFlagType.name()] = df[data_types.TestSampleFlagType.name()]
-            united_df[data_types.LabelType.name()] = df[data_types.LabelType.name()]
-            united_df[data_types.RelativePathType.name()] = df[data_types.RelativePathType.name()]
-            united_df[column] = df[column]
+            united_df = df
         else:
             suffix = '_' + str(i)
-            united_df = pd.merge(united_df, df[[data_types.RelativePathType.name(), column]],
+            united_df = pd.merge(united_df, df,
                                  on=data_types.RelativePathType.name(), how='inner',
                                  suffixes=('', suffix))
-
-    target_columns = get_columns_which_start_with(united_df, column)
-    return united_df, target_columns
+    return united_df
 
 
 def get_labels(data_df: pd.DataFrame) -> List[str]:

@@ -1,30 +1,16 @@
 import numpy as np
-import pandas as pd
+import matplotlib as mpl
 from astropy.convolution import convolve, Gaussian2DKernel
+from PIL import Image
 
 
-def visualize_segmentation_probabilities(image, probabilities, color_map: Union[int, str, np.array] = cv2.COLORMAP_JET,
-                                         alpha=0.8, inplace=True):
-    """
-    Arguments:
-        image: изображение, на котором нужно визуализировать сегментацию;
-        probabilities: вероятности принадлежности пикселей классу
-        color_map: int - номер color_map в cv2 enum, например cv2.COLORMAP_JET == 2;
-                   str - имя мэппинга;
-                   np.array с shape [256, 3] или [256] - трёх- или одноканальный цвет для каждого класса сегментации;
-        alpha: непрозрачность визуализации
-        inplace: возвращать новое изображение или раскрашивать переданное;
-    """
-    assert len(probabilities.shape) == 2
-    assert image.shape[0] == probabilities.shape[0]
-    assert image.shape[1] == probabilities.shape[1]
-
-    segmentation = apply_color_map((probabilities * 255).astype(np.uint8), color_map)
+def visualize_probabilities(image, probabilities, alpha=0.8):
+    cmap = mpl.colormaps['jet']
+    segmentation = Image.fromarray(np.uint8(cmap(probabilities) * 255)).convert('RGB')
     probabilities = probabilities[:, :, np.newaxis] * alpha
 
     out = (image * (1 - probabilities) + probabilities * segmentation).astype(np.uint8)
-    if inplace:
-        image[:] = out[:]
+    out = Image.fromarray(out)
     return out
 
 
@@ -37,19 +23,26 @@ def get_heatmap(gradients: np.ndarray):
     return smoothed_heatmap
 
 
-def overlay_heatmap(gradients: np.array, crop_box: Box, img):
-    crop_img = img[crop_box.slices()].copy()
-    heatmap = cv2.resize(get_heatmap(gradients), (crop_img.shape[1], crop_img.shape[0]),
-                         interpolation=cv2.INTER_AREA)
+def overlay_heatmap(gradients: np.array, img):
+    heatmap = get_heatmap(gradients)
+    heatmap = Image.fromarray(np.uint8(heatmap * 255))
+    heatmap = np.array(heatmap.resize(img.size))
     probabilities = ((heatmap - heatmap.min()) / (heatmap.max() - heatmap.min()))
-    return visualize_segmentation_probabilities(crop_img, probabilities, alpha=1.0, inplace=True)
+    return visualize_probabilities(img, probabilities, alpha=0.7)
 
 
-def overlay_map(image, gradients):
-    overlay_heatmap(gradients, image)
+def overlay_map(image, grads_file):
+    with open(grads_file, 'rb') as f:
+        grads = np.load(f)
+    im = Image.open(image).convert('RGB')
+    return overlay_heatmap(grads, im)
 
 
 def test():
-    grads_file = '/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/tool_working_dir/BalloonsBubbles/AlexNetWrapper_BalloonsBubbles_230502_185719.grads.pkl'
-    grads_df = pd.read_pickle(grads_file)
-    grads_df[data_types.RelativePathType.name()][0]
+    grads_file = '/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/tool_working_dir/BalloonsBubbles/grads/balloon/test/717IrZim2gL.jpg.grads.npy'
+    image = '/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/datasets/BalloonsBubbles/balloon/test/717IrZim2gL.jpg'
+    overlay_map(image, grads_file)
+
+
+if __name__ == "__main__":
+    test()

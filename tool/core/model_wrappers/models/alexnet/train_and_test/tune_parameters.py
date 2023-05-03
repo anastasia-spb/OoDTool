@@ -34,7 +34,7 @@ def train_with_trial(model, trial, loss_func, optimizer, train_loader, val_loade
             raise optuna.exceptions.TrialPruned()
 
     if save_model:
-        timestamp_str = datetime.now().strftime("%d-%b-%Y_%H-%M-%S")
+        timestamp_str = datetime.utcnow().strftime("%y%m%d_%H%M%S.%f")[:-3]
         model_parameters_file = "".join(('./model_', timestamp_str, '.pth'))
         torch.save(model.state_dict(), model_parameters_file)
 

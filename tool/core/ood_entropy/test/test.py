@@ -12,7 +12,7 @@ def test_ood_entropy_pipeline():
 
     pipeline = OoDScore()
     test_file = 'test_data/LogisticRegression_230501_191751.clf.pkl'
-    _ = pipeline.run(test_file, metadata_folder)
+    _ = pipeline.run([test_file, test_file], metadata_folder)
     ood_df = pipeline.get_ood_df()
     plt.hist(ood_df[data_types.types.OoDScoreType.name()], density=True, bins=30)
     plt.show()

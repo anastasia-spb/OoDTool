@@ -1,5 +1,6 @@
 import os
 import pickle
+from typing import List
 from datetime import datetime
 
 import numpy as np
@@ -15,8 +16,8 @@ class OoDScore:
     def __init__(self):
         self.ood_df = pd.DataFrame()
 
-    def run(self, probabilities_file, output_dir):
-        probabilities_df = pd.read_pickle(probabilities_file)
+    def run(self, probabilities_files: List[str], output_dir):
+        probabilities_df = data_helpers.merge_data_files(probabilities_files)
         probabilities_columns = \
             data_helpers.get_columns_which_start_with(probabilities_df, data_types.ClassProbabilitiesType.name())
 
@@ -37,7 +38,7 @@ class OoDScore:
         return self.ood_df
 
     def __store(self, output_dir) -> str:
-        timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
+        timestamp_str = datetime.utcnow().strftime("%y%m%d_%H%M%S.%f")[:-3]
         name = "".join(('./ood_score_', timestamp_str, '.ood.pkl'))
         output_file = os.path.join(output_dir, name)
         with open(output_file, 'wb') as handle:

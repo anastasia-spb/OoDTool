@@ -67,6 +67,7 @@ class PathsSettingsFrame(QFrame):
 
         if self.create_new_folder and os.path.exists(self.setting.dataset_root_path):
             self.setting.metadata_folder = create_new_session_folder(self.setting.dataset_root_path)
+            self.working_dir_line.setText(self.setting.metadata_folder)
 
         self.ood_settings_changed_signal.emit(self.setting)
         self.config.save()
@@ -76,7 +77,6 @@ class PathsSettingsFrame(QFrame):
                                                                         directory=self.setting.metadata_folder)
         self.ood_settings_changed_signal.emit(self.setting)
         self.working_dir_line.setText(self.setting.metadata_folder)
-        self.config.save()
 
     def emit_settings(self):
         self.ood_settings_changed_signal.emit(self.setting)

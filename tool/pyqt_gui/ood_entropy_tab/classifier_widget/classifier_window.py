@@ -30,7 +30,6 @@ class ClassifierFrame(QFrame):
         super(ClassifierFrame, self).__init__(parent)
 
         self.settings = PathsSettings()
-        self.classifier_output_file = '...'
         self.ood_output = '...'
 
         self.selected_classifier_tag = list(CLASSIFIER_WRAPPERS.keys())[0]
@@ -53,7 +52,7 @@ class ClassifierFrame(QFrame):
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setWidgetResizable(True)
         self.scroll.setWidget(self.classifier_params_widget)
-        self.scroll.setMinimumHeight(400)
+        self.scroll.setMinimumHeight(600)
         self.layout.addWidget(self.scroll)
 
         self.__add_evaluate_button()
@@ -95,11 +94,6 @@ class ClassifierFrame(QFrame):
 
         self.layout.addLayout(buttons_layout)
 
-        self.output_file = QLineEdit(self.classifier_output_file)
-        self.output_file.setStyleSheet("color: gray")
-        self.output_file.returnPressed.connect(self.__set_embeddings_file_back)
-        self.layout.addWidget(self.output_file)
-
         self.ood_file_line = QLineEdit(self.ood_output)
         self.ood_file_line.setStyleSheet("color: gray")
         self.ood_file_line.returnPressed.connect(self.__set_ood_file_back)
@@ -107,9 +101,6 @@ class ClassifierFrame(QFrame):
 
     def __add_params(self):
         self.classifier_params_widget.add_outer_frame(self.classifier.input_hint())
-
-    def __set_embeddings_file_back(self):
-        self.output_file.setText(self.classifier_output_file)
 
     def __set_ood_file_back(self):
         self.ood_file_line.setText(self.ood_output)
@@ -133,15 +124,11 @@ class ClassifierFrame(QFrame):
         self.classifier._signal.connect(self.signal_accept)
         self.classifier.start()
 
-    def signal_accept(self, msg):
-        if msg == 0:
-            self.classifier_output_file = self.classifier.get_output_file()
-            self.output_file.setText(self.classifier_output_file)
-
-            if os.path.isfile(self.classifier_output_file):
-                pipeline = OoDScore()
-                self.ood_output = pipeline.run(self.classifier_output_file, self.settings.metadata_folder)
-                self.ood_file_line.setText(self.ood_output)
+    def signal_accept(self, output_files):
+        if len(output_files) > 0:
+            pipeline = OoDScore()
+            self.ood_output = pipeline.run(output_files, self.settings.metadata_folder)
+            self.ood_file_line.setText(self.ood_output)
         else:
             QMessageBox.warning(self, "OoDScore", "Failed")
 

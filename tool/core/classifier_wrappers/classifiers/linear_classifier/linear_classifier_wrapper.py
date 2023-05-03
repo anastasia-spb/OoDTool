@@ -56,7 +56,7 @@ class LinearClassifierWrapper(IClassifier):
         super().__init__()
         self.weight_decay = 0.0
         self.batch_size = 32
-        self.checkpoint = '.ckpt'
+        self.checkpoint = None
 
     @classmethod
     def parameters_hint(cls):
@@ -65,7 +65,7 @@ class LinearClassifierWrapper(IClassifier):
     @classmethod
     def check_input_kwargs(cls, kwargs: dict):
 
-        checks = [lambda: "weight_decay" in kwargs, lambda: "checkpoint" in kwargs,
+        checks = [lambda: "weight_decay" in kwargs,
                   lambda: float(kwargs["weight_decay"]) >= 0.0]
 
         for check in checks:
@@ -74,8 +74,7 @@ class LinearClassifierWrapper(IClassifier):
         return True
 
     def input_hint(self):
-        return "{{'weight_decay' : '{0}', 'checkpoint' : '{1}' }}".format(self.weight_decay,
-                                                                          self.checkpoint)
+        return "{{'weight_decay' : '{0}'}}".format(self.weight_decay)
 
     @classmethod
     def _train(cls, model, batch_size, train_dataset, valid_dataset, device, output_dir: str, max_epochs=100):
@@ -124,22 +123,28 @@ class LinearClassifierWrapper(IClassifier):
         predictions = softmax(predictions)
         return predictions.detach().cpu().numpy()
 
-    def inference_mode(self):
-        return os.path.isfile(self.checkpoint)
+    def get_checkpoint(self):
+        return self.checkpoint
 
     def run(self, X_train: Optional[np.ndarray], y_train: Optional[np.ndarray],
-            X_test: np.ndarray, kwargs: dict, num_classes: int, output_dir: str) -> np.ndarray:
+            X_test: np.ndarray, kwargs: dict, num_classes: int, output_dir: str,
+            checkpoint: Optional[str] = None) -> np.ndarray:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         feature_dim = X_test.shape[1]
 
-        if "checkpoint" in kwargs:
-            self.checkpoint = kwargs["checkpoint"]
+        inference_mode = (checkpoint is not None) and os.path.isfile(checkpoint)
+
+        if inference_mode:
+            self.checkpoint = checkpoint
+            weight_decay = 0.0
+        else:
+            weight_decay = float(kwargs["weight_decay"])
 
         model = LinearClassifier(feature_dim=feature_dim, num_classes=num_classes,
-                                 weight_decay=float(kwargs["weight_decay"]))
+                                 weight_decay=weight_decay)
         model.to(device)
 
-        if not os.path.isfile(self.checkpoint):
+        if not inference_mode:
             self.checkpoint = self.__train_run(model, X_train, y_train, device, output_dir=output_dir)
 
         checkpoint = torch.load(self.checkpoint)

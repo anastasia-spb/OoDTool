@@ -89,6 +89,7 @@ TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DOGS_CATS_DATASET_ROOT,
                                                       {"model_checkpoint": 'resnet34'},
                                                       0.46)
 
+
 def test_pipeline(store_embeddings: bool):
     testdata = [
         ALEXNET_TEST_PARAMS,

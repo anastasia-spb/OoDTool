@@ -10,6 +10,8 @@ from tool.core.utils import data_helpers
 from tool.core.classifier_wrappers.classifiers.logistic_regression.lr_wrapper import LogisticRegressionWrapper
 from tool.core.classifier_wrappers.classifiers.linear_classifier.linear_classifier_wrapper import \
     LinearClassifierWrapper
+from tool.core.classifier_wrappers.classifier_pipeline_config import store_pipeline_config, ClfConfig, \
+    unite_configurations
 
 CLASSIFIER_WRAPPERS = {LogisticRegressionWrapper.tag: LogisticRegressionWrapper,
                        LinearClassifierWrapper.tag: LinearClassifierWrapper}
@@ -19,10 +21,6 @@ class ClassifierPipeline:
     def __init__(self, classifier_tag: str):
         self.probabilities_df = pd.DataFrame()
         self.classifier = CLASSIFIER_WRAPPERS[classifier_tag]()
-        self.output_file = ''
-
-    def get_output_file(self):
-        return self.output_file
 
     def input_hint(self):
         return self.classifier.input_hint()
@@ -34,19 +32,15 @@ class ClassifierPipeline:
         return self.classifier.check_input_kwargs(kwargs)
 
     @staticmethod
-    def prepare_data(embeddings_files, use_gt_for_training, probabilities_file, inference_mode):
-
-        data_df, embeddings_columns = data_helpers.merge_data_files(embeddings_files, data_types.EmbeddingsType.name())
+    def prepare_data(embedding_file, use_gt_for_training, probabilities_file, inference_mode):
+        data_df = pd.read_pickle(embedding_file)
         num_classes = data_helpers.get_number_of_classes(data_df)
 
-        def join_features(features_row):
-            return np.concatenate(features_row, axis=None, dtype=np.dtype('float64'))
-
-        embeddings_mat = data_df[embeddings_columns].values
-        X = np.apply_along_axis(join_features, axis=1, arr=embeddings_mat)
+        embeddings = data_df[data_types.EmbeddingsType.name()].tolist()
+        embeddings = np.array(embeddings, dtype=np.dtype('float64'))
 
         if inference_mode:
-            return None, None, X, num_classes
+            return None, None, embeddings, num_classes, data_df[data_types.RelativePathType.name()]
 
         if use_gt_for_training:
             labels = data_df[data_types.LabelsType.name()][0]
@@ -62,48 +56,113 @@ class ClassifierPipeline:
             train_indices, _ = train_test_split(valid_indices[0], test_size=0.7, random_state=42)
 
         if len(train_indices) == 0:
-            return None, None, X, num_classes
+            return None, None, embeddings, num_classes, data_df[data_types.RelativePathType.name()]
 
-        X_train, y_train = X[train_indices, :], y[train_indices]
+        X_train, y_train = embeddings[train_indices, :], y[train_indices]
         num_classes = len(data_df[data_types.LabelsType.name()][0])
-        return X_train, y_train, X, num_classes, data_df[data_types.RelativePathType.name()]
+        return X_train, y_train, embeddings, num_classes, data_df[data_types.RelativePathType.name()]
 
-    def __store(self, output_folder: str) -> str:
-        timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
+    def __store(self, output_folder: str, store_config_file: bool,
+                checkpoints: Optional[List[str]] = None, embeddings_file: Optional[str] = None,
+                probabilities_file: Optional[str] = None) -> (str, str):
+        timestamp_str = datetime.utcnow().strftime("%y%m%d_%H%M%S.%f")[:-3]
+        # Store clf file
         name = "".join((self.classifier.tag, "_", timestamp_str, '.clf.pkl'))
         file = os.path.join(output_folder, name)
         self.probabilities_df.to_pickle(file)
-        self.output_file = file
-        return file
+
+        # Store configuration
+        if store_config_file:
+            config_file = store_pipeline_config(embeddings_file, probabilities_file, self.classifier.tag, checkpoints,
+                                                output_folder)
+        else:
+            config_file = None
+
+        return file, config_file
 
     def get_probabilities_df(self) -> pd.DataFrame:
         return self.probabilities_df
 
-    def classify(self, embeddings_files: List[str], output_dir: str, use_gt_for_training: bool,
-                 probabilities_file: Optional[str], kwargs: List[dict]) -> str:
+    def classify(self, embeddings_file: str, output_dir: str, use_gt_for_training: bool,
+                 probabilities_file: Optional[str], kwargs: List[dict], checkpoint: Optional[str] = None) -> (str, str):
         """Walks through dataset directory and stores metadata information about images into <dataset_name>.meta.pkl file.
             Args:
-                embeddings_files: List of all files with embeddings
+                embeddings_file: List of all files with embeddings
                 output_dir: Folder where will be stored output files and model weights if necessary
                 use_gt_for_training: If GT labels shall be used for training or predictions from probabilities_file.
                 probabilities_file: File with probabilities, which shall be used for training. Required only if
                                     use_gt_for_training is set to False
                 kwargs: Classifier arguments
+                checkpoint: If checkpoint file is valid, then train part will be skipped
             Returns:
                 Absolute path to <dataset_name>.clf.pkl file or None if input data are invalid.
             """
-        if len(embeddings_files) == 0:
+
+        if not os.path.isfile(embeddings_file):
             return ''
 
-        X_train, y_train, X, num_classes, relative_paths = self.prepare_data(embeddings_files=embeddings_files,
+        inference_mode = (checkpoint is not None) and os.path.isfile(checkpoint) and checkpoint.endswith('.ckpt')
+        model_weights = None
+        if inference_mode:
+            model_weights = checkpoint
+
+        X_train, y_train, X, num_classes, relative_paths = self.prepare_data(embedding_file=embeddings_file,
                                                                              use_gt_for_training=use_gt_for_training,
                                                                              probabilities_file=probabilities_file,
-                                                                             inference_mode=
-                                                                             self.classifier.inference_mode())
+                                                                             inference_mode=inference_mode)
         self.probabilities_df[data_types.RelativePathType.name()] = relative_paths
+        checkpoints = []
         for i, params in enumerate(kwargs):
-            probabilities = self.classifier.run(X_train, y_train, X, params, num_classes, output_dir)
+            probabilities = self.classifier.run(X_train, y_train, X, params, num_classes, output_dir, model_weights)
+            pretrained_model = self.classifier.get_checkpoint()
+            if pretrained_model is not None:
+                checkpoints.append(pretrained_model)
+
             self.probabilities_df["".join((data_types.ClassProbabilitiesType.name(), "_", str(i)))] = \
                 probabilities.tolist()
 
-        return self.__store(output_dir)
+        return self.__store(output_dir, True, checkpoints, embeddings_file, probabilities_file)
+
+    def train_and_classify(self, embeddings_files: List[str], output_dir: str, use_gt_for_training: bool,
+                           probabilities_file: Optional[str], kwargs: List[dict]) -> List[str]:
+
+        if len(embeddings_files) < 1:
+            return []
+
+        output_files = []
+        config_files = []
+
+        for file in embeddings_files:
+            output_file, config_file = self.classify(file, output_dir, use_gt_for_training, probabilities_file, kwargs)
+            output_files.append(output_file)
+            config_files.append(config_file)
+
+        unite_configurations(output_dir, config_files)
+        return output_files
+
+    def classify_from_config(self, embeddings_file: str, clf_config: dict, output_dir: str) -> str:
+        config = ClfConfig(clf_config)
+        self.classifier = CLASSIFIER_WRAPPERS[config.get_tag()]()
+        weights = config.get_weights()
+
+        if not os.path.isfile(embeddings_file):
+            return ''
+
+        _, _, X, num_classes, relative_paths = self.prepare_data(embedding_file=embeddings_file,
+                                                                 use_gt_for_training=False,
+                                                                 probabilities_file=None,
+                                                                 inference_mode=True)
+
+        self.probabilities_df[data_types.RelativePathType.name()] = relative_paths
+        checkpoints = []
+        for i, checkpoint in enumerate(weights):
+            probabilities = self.classifier.run(None, None, X, dict(), num_classes, output_dir, checkpoint)
+            pretrained_model = self.classifier.get_checkpoint()
+            if pretrained_model is not None:
+                checkpoints.append(pretrained_model)
+
+            self.probabilities_df["".join((data_types.ClassProbabilitiesType.name(), "_", str(i)))] = \
+                probabilities.tolist()
+
+        probs_file, _ = self.__store(output_dir, store_config_file=False)
+        return probs_file

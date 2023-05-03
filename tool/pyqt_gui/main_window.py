@@ -30,7 +30,7 @@ class AppWidgets(QWidget):
         self.plot_tab = PlotTab(self)
 
         self.tabs.addTab(self.tools_tab, "Tools")
-        self.tabs.addTab(self.ood_entropy_tab, "OoDEntropy")
+        self.tabs.addTab(self.ood_entropy_tab, "OoD Tune")
         self.tabs.addTab(self.analyze_tab, "OoD Images")
         self.tabs.addTab(self.plot_tab, "Plot")
 

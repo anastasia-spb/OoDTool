@@ -63,7 +63,7 @@ def train_model(model, loss_func, optimizer, train_loader, val_loader, device, e
             best_valid_accuracy = metrics["valid acc"][-1]
 
             if save_model:
-                timestamp_str = datetime.now().strftime("%d-%b-%Y_%H-%M-%S")
+                timestamp_str = datetime.utcnow().strftime("%y%m%d_%H%M%S.%f")[:-3]
                 model_parameters_file = "".join((name, '_', str(best_valid_accuracy), '_', timestamp_str, '.pth'))
                 torch.save(model.state_dict(), model_parameters_file)
 

@@ -4,12 +4,13 @@ from tool.core.classifier_wrappers.test import test_data_type
 from tool.core.classifier_wrappers.classifiers.logistic_regression.lr_wrapper import LogisticRegressionWrapper
 
 TEST_DATA = test_data_type.TestData(LogisticRegressionWrapper.tag,
-                                    ['test_data/ResNetDroneBird230424_191030.emb.pkl'],
+                                    'test_data/ResNetDroneBird230424_191030.emb.pkl',
                                     None,
                                     [{"C": '0.00001', "solver": 'liblinear'},
                                      {"C": '10000.0', "solver": 'liblinear'},
                                      {"C": '1.0', "solver": 'liblinear'}],
-                                    use_gt=True)
+                                    use_gt=True,
+                                    checkpoint=None)
 
 
 def lr_classifier_test(test_func: Callable[[test_data_type.TestData], None]):

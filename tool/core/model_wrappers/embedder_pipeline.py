@@ -81,7 +81,7 @@ class EmbedderPipeline:
         self.__save_model_output(self.dataset_name, self.metadata_folder, requires_grad)
 
     def __save_model_output(self, dataset_name, metadata_folder, requires_grad):
-        timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
+        timestamp_str = datetime.utcnow().strftime("%y%m%d_%H%M%S.%f")[:-3]
         embedding = self.model_output_df[types.EmbeddingsType.name()][0]
         embedding_dim = len(embedding)
 
@@ -92,9 +92,20 @@ class EmbedderPipeline:
         self.model_output_df.to_pickle(self.embeddings_pkl_file)
 
         if requires_grad:
-            name = "".join((self.model_wrapper.get_name(), "_", dataset_name, "_", timestamp_str, '.grads.pkl'))
-            self.grads_df_file = os.path.join(metadata_folder, name)
-            self.grads_df.to_pickle(self.grads_df_file)
+            grads_folder = os.path.join(metadata_folder, "grads")
+            if not os.path.exists(grads_folder):
+                os.makedirs(grads_folder)
+
+            def save_grad(row):
+                rel_path, file_name = os.path.split(row[types.RelativePathType.name()])
+                folder_to_save = os.path.join(grads_folder, rel_path)
+                if not os.path.exists(folder_to_save):
+                    os.makedirs(folder_to_save)
+                array_file_name = os.path.join(folder_to_save, "".join((file_name, '.grads.npy')))
+                with open(array_file_name, 'wb') as f:
+                    np.save(f, row["grads"])
+
+            self.grads_df.apply(lambda row: save_grad(row), axis=1)
 
     def __empty_cache(self):
         if self.device == torch.device('cuda'):

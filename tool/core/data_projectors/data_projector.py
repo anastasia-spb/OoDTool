@@ -47,7 +47,7 @@ class DataProjector:
         data_df.drop([types.EmbeddingsType.name()], axis=1, inplace=True)
         data_df[types.ProjectedEmbeddingsType.name()] = x.tolist()
 
-        timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
+        timestamp_str = datetime.utcnow().strftime("%y%m%d_%H%M%S.%f")[:-3]
         name = "".join((self.method_name, "_", timestamp_str, ".2emb.pkl"))
         self.output_file = os.path.join(metadata_folder, name)
         data_df.to_pickle(self.output_file)

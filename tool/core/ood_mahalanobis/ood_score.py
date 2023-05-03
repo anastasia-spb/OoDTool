@@ -92,7 +92,7 @@ class OoDMahalanobisScore:
         self.ood_df[data_types.OoDScoreType.name()] = normalized_factor.tolist()
 
     def __store(self, output_dir) -> str:
-        timestamp_str = datetime.now().strftime("%y%m%d_%H%M%S")
+        timestamp_str = datetime.utcnow().strftime("%y%m%d_%H%M%S.%f")[:-3]
         name = "".join(('./mahalanobis_ood_score_', timestamp_str, '.ood.pkl'))
         output_file = os.path.join(output_dir, name)
         with open(output_file, 'wb') as handle:

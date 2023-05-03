@@ -22,11 +22,11 @@ class IClassifier(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def inference_mode(self) -> bool:
+    def get_checkpoint(self):
         pass
 
     @abc.abstractmethod
     def run(self, X_train: Optional[np.ndarray], y_train: Optional[np.ndarray],
-            X_test: np.ndarray, kwargs: dict, num_classes: int, output_dir: str) -> np.ndarray:
+            X_test: np.ndarray, kwargs: dict, num_classes: int, output_dir: str,
+            checkpoint: Optional[str] = None) -> np.ndarray:
         pass
-

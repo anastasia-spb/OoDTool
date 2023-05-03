@@ -30,7 +30,7 @@ def test(test_data: test_data_type.TestData):
     predictions_columns = data_helpers.get_columns_which_start_with(predictions_df,
                                                                     data_types.ClassProbabilitiesType.name())
 
-    y_actual = get_y_actual(test_data.embeddings_pkl[0])
+    y_actual = get_y_actual(test_data.embeddings_pkl)
 
     for column_name in predictions_columns:
         print(column_name)
