@@ -52,7 +52,7 @@ class ClassifierFrame(QFrame):
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setWidgetResizable(True)
         self.scroll.setWidget(self.classifier_params_widget)
-        self.scroll.setMinimumHeight(600)
+        self.scroll.setMinimumHeight(500)
         self.layout.addWidget(self.scroll)
 
         self.__add_evaluate_button()

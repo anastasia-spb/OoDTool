@@ -3,15 +3,18 @@ import os
 from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
-    QHBoxLayout, QLabel, QFrame, QCheckBox, QComboBox
+    QHBoxLayout, QLabel, QFrame, QCheckBox, QComboBox, QLineEdit, QFileDialog, QPushButton
 )
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSignal
 
+from tool.core.ood_entropy.ood_pipeline import run_ood_pipeline
+
 from tool.pyqt_gui.paths_settings import PathsSettings
 from tool.pyqt_gui.paths_settings_frame import PathsSettingsFrame
 from tool.pyqt_gui.ood_entropy_tab.classifier_widget.classifier_window import ClassifierFrame
+from tool.pyqt_gui.qt_utils import helpers
 
 
 class EmbeddingsFilesFrame(QFrame):
@@ -28,6 +31,8 @@ class EmbeddingsFilesFrame(QFrame):
         # self.setMaximumHeight(200)
 
         self.layout = QVBoxLayout()
+        self.layout.setSpacing(0)
+        self.layout.addStretch(1)
         self.setLayout(self.layout)
 
     def ood_settings_changed(self, settings):
@@ -79,6 +84,56 @@ class EmbeddingsFilesFrame(QFrame):
                 self.files.append(file)
 
 
+class OoDFromConfig(QFrame):
+
+    def __init__(self, parent):
+        super(OoDFromConfig, self).__init__(parent)
+        self.settings = PathsSettings()
+
+        self.setFrameShape(QFrame.StyledPanel)
+        self.setMaximumHeight(300)
+        self.layout = QVBoxLayout()
+
+        self.config_file = ''
+        self.config_line = QLineEdit()
+        helpers.get_dir_layout(self.__get_config_file, self.config_line,
+                               "Select configuration file: ", self.config_file, self)
+
+        self.eval_button = QPushButton("Eval")
+        self.eval_button.clicked.connect(self.__eval)
+        self.layout.addWidget(self.eval_button, alignment=Qt.AlignmentFlag.AlignTop)
+
+        self.resulting_file = ''
+        self.result_file_line = QLineEdit(self.resulting_file)
+        self.result_file_line.setStyleSheet("color: gray")
+        self.result_file_line.returnPressed.connect(self.__set_file_back)
+        self.layout.addWidget(self.result_file_line, alignment=Qt.AlignmentFlag.AlignTop)
+
+        self.setLayout(self.layout)
+
+    def __set_file_back(self):
+        self.result_file_line.setText(self.resulting_file)
+
+    def __eval(self):
+        if not os.path.isfile(self.config_file):
+            return
+
+        self.resulting_file = run_ood_pipeline(self.settings.metadata_folder, self.config_file)
+        self.result_file_line.setText(self.resulting_file)
+
+    def __get_config_file(self):
+        self.config_file = QFileDialog.getOpenFileName(self, 'Open file',
+                                                       'c:\\', "Config (*.config.json)",
+                                                       options=QFileDialog.DontUseNativeDialog)[0]
+        if not os.path.isfile(self.config_file):
+            return
+
+        self.config_line.setText(self.config_file)
+
+    def ood_settings_changed(self, settings):
+        self.settings = settings
+
+
 class OoDEntropyWindow(QWidget):
     def __init__(self, parent):
         super(OoDEntropyWindow, self).__init__(parent)
@@ -93,6 +148,9 @@ class OoDEntropyWindow(QWidget):
 
         self.embeddings_file_frame = EmbeddingsFilesFrame(self)
         self.left_layout.addWidget(self.embeddings_file_frame)
+
+        ood_eval_frame = OoDFromConfig(self)
+        self.left_layout.addWidget(ood_eval_frame)
 
         self.layout.addLayout(self.left_layout)
 
