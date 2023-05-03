@@ -103,8 +103,8 @@ class SimpleImageWindow(QMainWindow):
         self.setCentralWidget(self.image_label)
         self.setWindowTitle(title)
 
-    def show_image(self, img):
-        pix = QPixmap.fromImage(img)
+    def show_image(self, img_path: str):
+        pix = QPixmap(img_path)
         if (pix.width() >= pix.height()) and (pix.width() > 800):
             pix = pix.scaledToWidth(800)
         elif (pix.height() > pix.width()) and (pix.height() > 800):

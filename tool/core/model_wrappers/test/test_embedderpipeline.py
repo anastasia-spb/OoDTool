@@ -36,7 +36,7 @@ def test(test_data: TestData, store_embeddings: bool):
     def callback(progress_info: List[int]):
         pass
 
-    pipeline.predict(callback, requires_grad=True)
+    pipeline.predict(callback, requires_grad=True, metadata_folder='', dataset_root_dir=test_data.data_dir)
     model_output_df = pipeline.get_model_output()
 
     y_preds = model_output_df[data_types.ClassProbabilitiesType.name()].tolist()
@@ -92,10 +92,10 @@ TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DOGS_CATS_DATASET_ROOT,
 
 def test_pipeline(store_embeddings: bool):
     testdata = [
-        ALEXNET_TEST_PARAMS,
+        # ALEXNET_TEST_PARAMS,
         # TIMM_DENSNET_TEST_PARAMS,
         # TIMM_RESNET_TEST_PARAMS,
-        # TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS,
+        TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS,
     ]
 
     for test_data in testdata:

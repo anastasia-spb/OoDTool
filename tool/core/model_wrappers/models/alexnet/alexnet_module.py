@@ -13,6 +13,13 @@ class AlexNetTransforms(object):
             custom_transformations.PerImageNormalization()])(frame)
 
 
+class AlexNetCropTransform(object):
+    def __call__(self, frame):
+        return transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224)])(frame)
+
+
 class AlexNet(nn.Module):
     """
     Source: https://github.com/pytorch/vision/blob/main/torchvision/models/alexnet.py

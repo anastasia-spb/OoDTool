@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from tool.core.model_wrappers.models.i_model import IModel, ModelOutput
-from tool.core.model_wrappers.models.alexnet.alexnet_module import AlexNet, AlexNetTransforms
+from tool.core.model_wrappers.models.alexnet.alexnet_module import AlexNet, AlexNetTransforms, AlexNetCropTransform
 
 
 class AlexNetWrapperParameters:
@@ -37,6 +37,9 @@ class AlexNetWrapper(IModel):
     def image_transformation_pipeline(self):
         return AlexNetTransforms()
 
+    def get_image_crop(self):
+        return AlexNetCropTransform()
+
     @classmethod
     def get_batchsize(cls):
         return cls.parameters.batchsize
@@ -62,10 +65,9 @@ class AlexNetWrapper(IModel):
         _ = layer.register_forward_hook(copy_embeddings)
         prediction = self.model(img.to(self.device))
 
-        inputs = torch.argmax(prediction, dim=1)
-
         grads = None
         if requires_grad:
+            inputs = torch.argmax(prediction, dim=1)
             one_hot_encoding = F.one_hot(torch.tensor(inputs), num_classes=self.num_classes).to(self.device)
             prediction.backward(gradient=one_hot_encoding)
             grads = img.grad.detach().cpu()

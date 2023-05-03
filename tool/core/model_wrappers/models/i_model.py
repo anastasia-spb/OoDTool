@@ -33,6 +33,10 @@ class IModel(metaclass=abc.ABCMeta):
     def image_transformation_pipeline(self):
         pass
 
+    @abc.abstractmethod
+    def get_image_crop(self):
+        pass
+
     @classmethod
     @abc.abstractmethod
     def get_batchsize(cls):

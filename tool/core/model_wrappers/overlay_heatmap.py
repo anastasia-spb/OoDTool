@@ -23,7 +23,7 @@ def get_heatmap(gradients: np.ndarray):
     return smoothed_heatmap
 
 
-def overlay_heatmap(gradients: np.array, img):
+def overlay_heatmap(gradients: np.array, img: Image):
     heatmap = get_heatmap(gradients)
     heatmap = Image.fromarray(np.uint8(heatmap * 255))
     heatmap = np.array(heatmap.resize(img.size))
@@ -39,9 +39,10 @@ def overlay_map(image, grads_file):
 
 
 def test():
-    grads_file = '/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/tool_working_dir/BalloonsBubbles/grads/balloon/test/717IrZim2gL.jpg.grads.npy'
-    image = '/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/datasets/BalloonsBubbles/balloon/test/717IrZim2gL.jpg'
-    overlay_map(image, grads_file)
+    grads_file = '/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/tool_working_dir/BalloonsBubbles/grads/balloon/test/7308740338_591f27b631_k.jpg.grads.npy'
+    image = '/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/datasets/BalloonsBubbles/balloon/test/7308740338_591f27b631_k.jpg'
+    result = overlay_map(image, grads_file)
+    result.show()
 
 
 if __name__ == "__main__":
