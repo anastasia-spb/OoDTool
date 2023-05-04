@@ -46,14 +46,17 @@ def epoch_train(model, loss_func, optimizer, train_loader, val_loader, device, m
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()  # Update model weights according to current gradients values
+        del img
 
+    gc.collect()
     epoch_loss = torch.tensor(losses).mean()
     print("Train loss : {:.3f}".format(epoch_loss))
     metrics["train loss"].append(epoch_loss)
     calculate_val_loss_and_accuracy(model, loss_func, val_loader, device, metrics)
 
 
-def train_model(model, loss_func, optimizer, train_loader, val_loader, device, epochs: int, save_model=True, name=""):
+def train_model(model, loss_func, optimizer, train_loader, val_loader, device, epochs: int, save_model=True, name="",
+                scheduler=None):
     metrics = {"train loss": [], "valid loss": [], "valid acc": []}
     best_valid_accuracy = 0.0
     for epoch in range(1, epochs + 1):
@@ -66,6 +69,8 @@ def train_model(model, loss_func, optimizer, train_loader, val_loader, device, e
                 timestamp_str = datetime.utcnow().strftime("%y%m%d_%H%M%S.%f")[:-3]
                 model_parameters_file = "".join((name, '_', str(best_valid_accuracy), '_', timestamp_str, '.pth'))
                 torch.save(model.state_dict(), model_parameters_file)
+        if scheduler is not None:
+            scheduler.step(epoch + 1)
 
     return metrics
 
