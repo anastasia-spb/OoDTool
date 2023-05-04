@@ -15,9 +15,9 @@ from tool.core.model_wrappers.models.utils.jpeg_dataset import JpegTrainDataset,
 from tool.core.model_wrappers.models.alexnet.train_and_test.utils import train_model
 
 
-def train_timm(checkpoint_path=''):
+def train_timm(checkpoint_path='', finetune=True):
     data_dir = '/home/vlasova/datasets/DroneBird'
-    metadata_file = '/home/vlasova/datasets/DroneBird/oodsession_1/DroneBird.meta.pkl'
+    metadata_file = '/home/vlasova/datasets/DroneBird/oodsession_0/DroneBird.meta.pkl'
     classes = ["Drone", "Bird"]
 
     # Cuda maintenance
@@ -26,7 +26,10 @@ def train_timm(checkpoint_path=''):
     torch.cuda.empty_cache()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    model = timm.create_model(model_name='vgg16_bn', pretrained=False, num_classes=len(classes),
+    if finetune:
+        checkpoint_path = ''
+
+    model = timm.create_model(model_name='vgg16_bn', pretrained=finetune, num_classes=len(classes),
                               checkpoint_path=checkpoint_path).to(device)
     config = resolve_data_config({}, model=model)
     image_transformation = create_transform(**config)
@@ -41,7 +44,7 @@ def train_timm(checkpoint_path=''):
     train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(validation_subset, batch_size=batch_size, shuffle=False)
 
-    training_epochs = 30
+    training_epochs = 50
     cooldown_epochs = 10
     num_epochs = training_epochs + cooldown_epochs
 

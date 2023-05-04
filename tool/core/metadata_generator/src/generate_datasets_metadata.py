@@ -16,7 +16,8 @@ def parse_dataset_description(description_json: str):
         for root_dir, _, filenames in os.walk(images_path):
             for name in filenames:
                 filename, file_extension = os.path.splitext(name)
-                if file_extension not in {".jpg", ".png", ".jpeg"}:
+                if file_extension.lower() not in {".jpg", ".png", ".jpeg"}:
+                    print("Unknown format: {0}".format(filename))
                     continue
                 rel_path = os.path.relpath(os.path.join(root_dir, name), images_path)
                 samples.append(data_types.MetadataSampleType(
