@@ -15,7 +15,9 @@ from tool.core.model_wrappers.models.utils.jpeg_dataset import JpegTrainDataset,
 from tool.core.model_wrappers.models.alexnet.train_and_test.utils import train_model
 
 
-def train_timm(checkpoint_path='', finetune=True):
+def train_timm(
+        checkpoint_path='/home/vlasova/Desktop/NIR/NIR/OoDTool/tool/core/model_wrappers/models/timm_resnet/timm_vgg16_bn_0.7101449275362319_230504_082850.511.pth',
+        finetune=False):
     data_dir = '/home/vlasova/datasets/DroneBird'
     metadata_file = '/home/vlasova/datasets/DroneBird/oodsession_0/DroneBird.meta.pkl'
     classes = ["Drone", "Bird"]
