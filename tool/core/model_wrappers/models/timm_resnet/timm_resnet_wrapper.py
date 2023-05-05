@@ -22,7 +22,10 @@ class TimmWrapperParameters:
 class TimmResnetEmbedder(torch.nn.Module):
     def __init__(self, model_checkpoint, num_classes, checkpoint_path=''):
         super(TimmResnetEmbedder, self).__init__()
-        self.model = timm.create_model(model_name=model_checkpoint, pretrained=True,
+        pretrained = True
+        if os.path.isfile(checkpoint_path) and checkpoint_path.endswith(".pth"):
+            pretrained = False
+        self.model = timm.create_model(model_name=model_checkpoint, pretrained=pretrained,
                                        num_classes=num_classes, checkpoint_path=checkpoint_path)
         self.model.eval()
 
@@ -94,10 +97,9 @@ class TimmResnetWrapper(IModel):
 
     @classmethod
     def get_input_hint(cls):
-        return "{{'model_checkpoint' : '{0}', 'model_labels' : '{1}', 'model_checkpoint' : '{2}' }}".format(
+        return "{{'model_checkpoint' : '{0}', 'model_labels' : '{1}', 'checkpoint_path' : '' }}".format(
             cls.parameters.model_checkpoint,
-            cls.parameters.model_labels,
-            cls.parameters.model_checkpoint)
+            cls.parameters.model_labels)
 
     def image_transformation_pipeline(self):
         config = resolve_data_config({}, model=self.model.model)

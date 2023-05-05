@@ -9,7 +9,6 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 
 from tool.core.model_wrappers.models.alexnet.alexnet_wrapper import AlexNetWrapper
 from tool.core.model_wrappers.models.timm_resnet.timm_resnet_wrapper import TimmResnetWrapper
-from tool.core.model_wrappers.models.regnet.regnet_wrapper import RegnetWrapper
 from tool.core.model_wrappers.embedder_pipeline import EmbedderPipeline
 from tool.core import data_types
 
@@ -36,7 +35,7 @@ def test(test_data: TestData, store_embeddings: bool):
     def callback(progress_info: List[int]):
         pass
 
-    pipeline.predict(callback, requires_grad=True, metadata_folder='', dataset_root_dir=test_data.data_dir)
+    pipeline.predict(callback, requires_grad=True)
     model_output_df = pipeline.get_model_output()
 
     y_preds = model_output_df[data_types.ClassProbabilitiesType.name()].tolist()
@@ -90,12 +89,24 @@ TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DOGS_CATS_DATASET_ROOT,
                                                       0.46)
 
 
+TIMM_PRETRAINED_TEST_PARAMS = TestData('/home/nastya/Desktop/OoDTool/DroneBird',
+                                        '/home/nastya/Desktop/OoDTool/DroneBird/oodsession_8/DroneBird.meta.pkl',
+                                        TimmResnetWrapper.get_name(),
+                                        {'model_checkpoint' : 'vit_tiny_patch16_224_in21k',
+                                         'model_labels' : 'Drone, Bird',
+                                         'checkpoint_path' : '/home/nastya/Desktop/OoDTool/timm_vit_tiny_patch16_224_in21k_0.6774193548387096_230504_210215.812.pth' },
+                                        0.46)
+
+
+
+
 def test_pipeline(store_embeddings: bool):
     testdata = [
         # ALEXNET_TEST_PARAMS,
         # TIMM_DENSNET_TEST_PARAMS,
         # TIMM_RESNET_TEST_PARAMS,
-        TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS,
+        # TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS,
+        TIMM_PRETRAINED_TEST_PARAMS,
     ]
 
     for test_data in testdata:
@@ -105,4 +116,4 @@ def test_pipeline(store_embeddings: bool):
 
 
 if __name__ == "__main__":
-    test_pipeline(store_embeddings=False)
+    test_pipeline(store_embeddings=True)

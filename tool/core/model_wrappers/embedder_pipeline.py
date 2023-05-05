@@ -70,12 +70,11 @@ class EmbedderPipeline:
     def get_embeddings_pkl_file(self) -> str:
         return self.embeddings_pkl_file
 
-    def predict(self, callback: Callable[[List[int]], None], requires_grad,
-                metadata_folder: str = '', dataset_root_dir: str = ''):
+    def predict(self, callback: Callable[[List[int]], None], requires_grad):
         self.__setup()
 
         if requires_grad:
-            grads_folder = os.path.join(metadata_folder, "grads")
+            grads_folder = os.path.join(self.metadata_folder, "grads")
             if not os.path.exists(grads_folder):
                 os.makedirs(grads_folder)
 
@@ -85,7 +84,7 @@ class EmbedderPipeline:
                 callback([pbar.n, pbar.total])
                 result = self.__forward(img, requires_grad)
                 if requires_grad:
-                    self.__store_grads(result["grads"], paths, grads_folder, dataset_root_dir)
+                    self.__store_grads(result["grads"], paths, grads_folder, self.data_dir)
                     result["grads"] = None
                 model_output.append(result)
 

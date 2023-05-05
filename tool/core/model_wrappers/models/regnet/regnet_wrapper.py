@@ -1,9 +1,17 @@
 import torch
 from torchvision import transforms
 
+from tool.core.utils.mock_missing import mock_missing
 from tool.core.model_wrappers.models.i_model import IModel, ModelOutput
-from catalights.models.multihead_regnet import regnet_mh_y_800mf
-from catalights.models.labels import labels_map
+try:
+    from catalights.models.multihead_regnet import regnet_mh_y_800mf
+except ImportError:
+    regnet_mh_y_800mf = mock_missing('regnet_mh_y_800mf')
+
+try:
+    from catalights.models.labels import labels_map
+except ImportError:
+    labels_map = mock_missing('labels_map')
 
 
 class RegnetWrapperParameters:

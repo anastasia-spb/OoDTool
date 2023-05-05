@@ -19,9 +19,7 @@ class LinearClassifier(pl.LightningModule):
         self.model = torch.nn.Linear(feature_dim, num_classes)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(),
-                                      lr=self.lr,
-                                      weight_decay=self.weight_decay)
+        optimizer = torch.optim.SGD(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
         lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
                                                             milestones=[int(self.max_epochs * 0.6),
