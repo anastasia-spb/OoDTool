@@ -31,7 +31,7 @@ def train_timm(
     if finetune:
         checkpoint_path = ''
 
-    model = timm.create_model(model_name='vit_tiny_patch16_224_in21k', pretrained=finetune, num_classes=len(classes),
+    model = timm.create_model(model_name='densenet121', pretrained=finetune, num_classes=len(classes),
                               checkpoint_path=checkpoint_path).to(device)
     config = resolve_data_config({}, model=model)
     image_transformation = create_transform(**config)
@@ -42,7 +42,7 @@ def train_timm(
     train_subset, validation_subset = random_split(train_dataset, [train_set_size, validation_set_size],
                                                    generator=torch.Generator().manual_seed(42))
 
-    batch_size = 32
+    batch_size = 16
     train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(validation_subset, batch_size=batch_size, shuffle=False)
 
@@ -65,9 +65,9 @@ def train_timm(
     model.train()
     metrics = train_model(model, loss_fn, optimizer, train_loader, val_loader,
                           device=device, epochs=num_epochs, save_model=True,
-                          name='timm_vgg16_bn', scheduler=scheduler)
+                          name='timm_densenet121', scheduler=scheduler)
     metrics_df = pd.DataFrame.from_dict(metrics, orient="index")
-    metrics_df.to_csv("timm_vgg16_bn_eval_metrics.csv")
+    metrics_df.to_csv("timm_densenet121_eval_metrics.csv")
 
 
 if __name__ == "__main__":

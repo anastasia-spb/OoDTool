@@ -10,7 +10,7 @@ def test():
     meta_file_path = generate_metadata(path, output_folder)
 
     data_df = pd.read_pickle(meta_file_path)
-    # print(data_df.to_string(index=False))
+    print(data_df.to_string(index=False))
 
 
 if __name__ == "__main__":

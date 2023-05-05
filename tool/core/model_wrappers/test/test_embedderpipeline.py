@@ -28,14 +28,14 @@ def get_y_actual(metadata_file: str):
     return meta_df.apply(lambda row: labels.index(row[data_types.LabelType.name()]), axis=1).values
 
 
-def test(test_data: TestData, store_embeddings: bool):
+def test(test_data: TestData, store_embeddings: bool, requires_grad: bool):
     pipeline = EmbedderPipeline(test_data.metadata_file, test_data.data_dir, test_data.embedder_name,
                                 use_cuda=True, **test_data.wrapper_parameters)
 
     def callback(progress_info: List[int]):
         pass
 
-    pipeline.predict(callback, requires_grad=True)
+    pipeline.predict(callback, requires_grad=requires_grad)
     model_output_df = pipeline.get_model_output()
 
     y_preds = model_output_df[data_types.ClassProbabilitiesType.name()].tolist()
@@ -88,19 +88,16 @@ TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DOGS_CATS_DATASET_ROOT,
                                                       {"model_checkpoint": 'resnet34'},
                                                       0.46)
 
-
 TIMM_PRETRAINED_TEST_PARAMS = TestData('/home/vlasova/datasets/TrafficLightsDVC',
-                                        '/home/vlasova/datasets/TrafficLightsDVC/oodsession_manual/PedestrianLights.meta.pkl',
-                                        TimmResnetWrapper.get_name(),
-                                        {'model_checkpoint' : 'vit_tiny_patch16_224_in21k',
-                                         'model_labels' : 'stop, forward, blinked',
-                                         'checkpoint_path' : '/home/vlasova/Desktop/NIR/NIR/OoDTool/tool/core/model_wrappers/models/timm_resnet/timm_vgg16_bn_0.9522682445759368_230504_165144.455.pth' },
-                                        0.46)
+                                       '/home/vlasova/datasets/TrafficLightsDVC/oodsession_manual/PedestrianLights.meta.pkl',
+                                       TimmResnetWrapper.get_name(),
+                                       {'model_checkpoint': 'densenet121',
+                                        'model_labels': 'stop, forward, blinked',
+                                        'checkpoint_path': '/home/vlasova/Desktop/NIR/NIR/OoDTool/tool/core/model_wrappers/models/timm_resnet/timm_densenet121_0.9877712031558186_230505_112009.860.pth'},
+                                       0.46)
 
 
-
-
-def test_pipeline(store_embeddings: bool):
+def test_pipeline(store_embeddings: bool, requires_grad: bool):
     testdata = [
         # ALEXNET_TEST_PARAMS,
         # TIMM_DENSNET_TEST_PARAMS,
@@ -111,9 +108,9 @@ def test_pipeline(store_embeddings: bool):
 
     for test_data in testdata:
         print("Testing {0}".format(test_data.embedder_name))
-        test(test_data, store_embeddings)
+        test(test_data, store_embeddings, requires_grad)
         print("===========================================")
 
 
 if __name__ == "__main__":
-    test_pipeline(store_embeddings=True)
+    test_pipeline(store_embeddings=True, requires_grad=True)

@@ -83,7 +83,7 @@ class EmbedderPipeline:
             for img, _, paths in pbar:
                 callback([pbar.n, pbar.total])
                 result = self.__forward(img, requires_grad)
-                if requires_grad:
+                if requires_grad and result["grads"] is not None:
                     self.__store_grads(result["grads"], paths, grads_folder, self.data_dir)
                     result["grads"] = None
                 model_output.append(result)
