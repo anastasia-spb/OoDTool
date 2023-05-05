@@ -19,7 +19,7 @@ Further user will be asked to select classifier type and enter parameters.
 For every feature file will be combined with each classifier. Results and pretrained weights will be stored 
 besides feature file. 
 
-Please, see 
+Please, see ...
 
 ## LogisticRegressionWrapper parameters
 

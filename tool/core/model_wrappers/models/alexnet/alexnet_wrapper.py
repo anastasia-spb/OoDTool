@@ -17,7 +17,7 @@ class AlexNetWrapper(IModel):
 
     def __init__(self, device, **kwargs):
         super().__init__()
-        self.parameters.weights_path = kwargs["weights_path"]
+        self.parameters.weights_path = kwargs["checkpoint_path"]
         self.parameters.model_labels = kwargs["model_labels"]
         labels_list = self.parameters.model_labels.split(", ")
         self.idx_to_label = {i: labels_list[i] for i in range(len(labels_list))}

@@ -6,7 +6,7 @@ from tool.core.metadata_generator.generator import generate_metadata
 
 def run():
     parser = argparse.ArgumentParser(description='Generate metadata')
-    parser.add_argument('-f', '--description_file', default='', required=False)
+    parser.add_argument('-f', '--description_file', default='', required=True)
     args = parser.parse_args()
 
     output_folder, _ = os.path.split(args.description_file)

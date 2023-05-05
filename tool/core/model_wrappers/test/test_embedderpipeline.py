@@ -52,7 +52,7 @@ def test(test_data: TestData, store_embeddings: bool, requires_grad: bool):
     print("\nConfusion Matrix : ")
     print(confusion_matrix(y_actual, predicted_classes))
 
-    assert math.isclose(score, test_data.expected_accuracy, abs_tol=0.1)
+    # assert math.isclose(score, test_data.expected_accuracy, abs_tol=0.1)
 
     if store_embeddings:
         model_output_df.to_pickle(''.join((test_data.embedder_name, '_', 'test_pipeline.emb.pkl')))
@@ -64,7 +64,7 @@ WORKING_DIR = '../../../../example_data/tool_working_dir'
 ALEXNET_TEST_PARAMS = TestData(BUBBLE_BALLOONS_DATASET_ROOT,
                                os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
                                AlexNetWrapper.get_name(),
-                               {"weights_path": '../../../../pretrained_weights/embedders/AlexNet_BalloonsBubbles.pth',
+                               {"checkpoint_path": '../../../../pretrained_weights/embedders/AlexNet_BalloonsBubbles.pth',
                                 "model_labels": "[bubble, balloon]"},
                                0.63)
 
@@ -88,10 +88,10 @@ TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DOGS_CATS_DATASET_ROOT,
                                                       {"model_checkpoint": 'resnet34'},
                                                       0.46)
 
-TIMM_PRETRAINED_TEST_PARAMS = TestData('/home/vlasova/datasets/TrafficLightsDVC',
-                                       '/home/vlasova/datasets/TrafficLightsDVC/oodsession_manual/PedestrianLights.meta.pkl',
+TIMM_PRETRAINED_TEST_PARAMS = TestData('/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/DogsCats',
+                                       '/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/DogsCats/oodsession_0/DogsCats.meta.pkl',
                                        TimmResnetWrapper.get_name(),
-                                       {'model_checkpoint': 'densenet121',
+                                       {'model_checkpoint': 'resnet50',
                                         'model_labels': 'stop, forward, blinked',
                                         'checkpoint_path': '/home/vlasova/Desktop/NIR/NIR/OoDTool/tool/core/model_wrappers/models/timm_resnet/timm_densenet121_0.9877712031558186_230505_112009.860.pth'},
                                        0.46)

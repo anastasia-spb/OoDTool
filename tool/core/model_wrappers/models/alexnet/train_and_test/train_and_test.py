@@ -32,7 +32,7 @@ def load_and_run(weights_path, model_labels):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    kwargs = {"weights_path": weights_path, "model_labels": model_labels}
+    kwargs = {"checkpoint_path": weights_path, "model_labels": model_labels}
     wrapper = AlexNetWrapper(device=device, **kwargs)
     image_transformation = wrapper.image_transformation_pipeline()
 
