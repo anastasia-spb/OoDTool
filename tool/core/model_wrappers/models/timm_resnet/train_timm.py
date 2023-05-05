@@ -18,9 +18,9 @@ from tool.core.model_wrappers.models.alexnet.train_and_test.utils import train_m
 def train_timm(
         checkpoint_path='',
         finetune=False):
-    data_dir = '/home/nastya/Desktop/OoDTool/DroneBird'
-    metadata_file = '/home/nastya/Desktop/OoDTool/DroneBird/oodsession_4/DroneBird.meta.pkl'
-    classes = ["Drone", "Bird"]
+    data_dir = '/home/vlasova/datasets/TrafficLightsDVC'
+    metadata_file = '/home/vlasova/datasets/TrafficLightsDVC/oodsession_manual/PedestrianLights.meta.pkl'
+    classes = ["stop", "forward", "blinked"]
 
     # Cuda maintenance
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
@@ -31,7 +31,7 @@ def train_timm(
     if finetune:
         checkpoint_path = ''
 
-    model = timm.create_model(model_name='vgg16_bn', pretrained=finetune, num_classes=len(classes),
+    model = timm.create_model(model_name='vit_tiny_patch16_224_in21k', pretrained=finetune, num_classes=len(classes),
                               checkpoint_path=checkpoint_path).to(device)
     config = resolve_data_config({}, model=model)
     image_transformation = create_transform(**config)
@@ -42,11 +42,11 @@ def train_timm(
     train_subset, validation_subset = random_split(train_dataset, [train_set_size, validation_set_size],
                                                    generator=torch.Generator().manual_seed(42))
 
-    batch_size = 16
+    batch_size = 32
     train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(validation_subset, batch_size=batch_size, shuffle=False)
 
-    training_epochs = 1
+    training_epochs = 100
     cooldown_epochs = 10
     num_epochs = training_epochs + cooldown_epochs
 
@@ -67,7 +67,7 @@ def train_timm(
                           device=device, epochs=num_epochs, save_model=True,
                           name='timm_vgg16_bn', scheduler=scheduler)
     metrics_df = pd.DataFrame.from_dict(metrics, orient="index")
-    metrics_df.to_csv("vgg16_bn_eval_metrics.csv")
+    metrics_df.to_csv("timm_vgg16_bn_eval_metrics.csv")
 
 
 if __name__ == "__main__":

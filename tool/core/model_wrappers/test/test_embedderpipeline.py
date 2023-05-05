@@ -89,12 +89,12 @@ TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DOGS_CATS_DATASET_ROOT,
                                                       0.46)
 
 
-TIMM_PRETRAINED_TEST_PARAMS = TestData('/home/nastya/Desktop/OoDTool/DroneBird',
-                                        '/home/nastya/Desktop/OoDTool/DroneBird/oodsession_8/DroneBird.meta.pkl',
+TIMM_PRETRAINED_TEST_PARAMS = TestData('/home/vlasova/datasets/TrafficLightsDVC',
+                                        '/home/vlasova/datasets/TrafficLightsDVC/oodsession_manual/PedestrianLights.meta.pkl',
                                         TimmResnetWrapper.get_name(),
                                         {'model_checkpoint' : 'vit_tiny_patch16_224_in21k',
-                                         'model_labels' : 'Drone, Bird',
-                                         'checkpoint_path' : '/home/nastya/Desktop/OoDTool/timm_vit_tiny_patch16_224_in21k_0.6774193548387096_230504_210215.812.pth' },
+                                         'model_labels' : 'stop, forward, blinked',
+                                         'checkpoint_path' : '/home/vlasova/Desktop/NIR/NIR/OoDTool/tool/core/model_wrappers/models/timm_resnet/timm_vgg16_bn_0.9522682445759368_230504_165144.455.pth' },
                                         0.46)
 
 

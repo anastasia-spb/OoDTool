@@ -4,8 +4,8 @@ from tool.core.metadata_generator.generator import generate_metadata
 
 
 def test():
-    path = '/home/vlasova/datasets/DroneBird/description.json'
-    output_folder = '/home/vlasova/datasets/DroneBird'
+    path = '/home/vlasova/datasets/TrafficLightsDVC/description_pedestrian.json'
+    output_folder = '/home/vlasova/datasets/TrafficLightsDVC'
 
     meta_file_path = generate_metadata(path, output_folder)
 
