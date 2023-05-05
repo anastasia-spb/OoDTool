@@ -91,9 +91,9 @@ TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DOGS_CATS_DATASET_ROOT,
 TIMM_PRETRAINED_TEST_PARAMS = TestData('/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/DogsCats',
                                        '/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/DogsCats/oodsession_0/DogsCats.meta.pkl',
                                        TimmResnetWrapper.get_name(),
-                                       {'model_checkpoint': 'resnet50',
-                                        'model_labels': 'stop, forward, blinked',
-                                        'checkpoint_path': '/home/vlasova/Desktop/NIR/NIR/OoDTool/tool/core/model_wrappers/models/timm_resnet/timm_densenet121_0.9877712031558186_230505_112009.860.pth'},
+                                       {'model_checkpoint': 'densenet121',
+                                        'model_labels': 'Dog, Cat',
+                                        'checkpoint_path': '/home/vlasova/Desktop/NIR/NIR/OoDTool/tool/core/model_wrappers/models/timm_resnet/try.pth'},
                                        0.46)
 
 

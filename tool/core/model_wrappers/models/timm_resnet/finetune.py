@@ -39,9 +39,11 @@ def finetune():
                                    label_col=data_types.LabelType.name(), item_tfms=Resize(224), device=device)
 
     model = 'densenet121'
-    learn = vision_learner(dls, model, n_out=2, metrics=accuracy)
-    learn.fine_tune(10)
-    learn.save('fine_tuned_{0}'.format(model))
+    epochs_to_finetune = 1
+    learn = vision_learner(dls, model, n_out=len(labels), metrics=accuracy)
+    learn.fine_tune(epochs_to_finetune)
+
+    learn.save('fine_tuned_{0}_epochs_{1}'.format(model, epochs_to_finetune))
 
 
 if __name__ == "__main__":

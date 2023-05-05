@@ -2,6 +2,8 @@
 
 Walks through all directories of selected dataset and generates <database_name>.meta.pkl file with columns:
 
+Output file extension shall be ".meta.pkl"
+
 
 | relative_path                 |  labels   | test_sample | label |
 |-------------------------------|:---------:|------------:|------:|

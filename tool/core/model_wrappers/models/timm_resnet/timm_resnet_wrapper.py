@@ -22,10 +22,7 @@ class TimmWrapperParameters:
 class TimmResnetEmbedder(torch.nn.Module):
     def __init__(self, model_checkpoint, num_classes, checkpoint_path=''):
         super(TimmResnetEmbedder, self).__init__()
-        pretrained = True
-        if os.path.isfile(checkpoint_path) and checkpoint_path.endswith(".pth"):
-            pretrained = False
-        self.model = timm.create_model(model_name=model_checkpoint, pretrained=pretrained,
+        self.model = timm.create_model(model_name=model_checkpoint, pretrained=True,
                                        num_classes=num_classes, checkpoint_path=checkpoint_path)
         self.model.eval()
 
