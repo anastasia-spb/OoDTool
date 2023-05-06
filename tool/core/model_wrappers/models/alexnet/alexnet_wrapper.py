@@ -14,6 +14,7 @@ class AlexNetWrapperParameters:
 
 class AlexNetWrapper(IModel):
     parameters = AlexNetWrapperParameters()
+    tag = "AlexNet"
 
     def __init__(self, device, **kwargs):
         super().__init__()

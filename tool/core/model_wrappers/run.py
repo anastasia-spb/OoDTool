@@ -19,7 +19,7 @@ def run():
     embedder_name = input()
 
     model = ''
-    if embedder_name == TimmResnetWrapper.get_name():
+    if embedder_name == TimmResnetWrapper.tag:
         print("Select model from {0}".format(SUPPORTED_CHECKPOINTS))
         model = input()
 

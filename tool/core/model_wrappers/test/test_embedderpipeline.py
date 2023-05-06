@@ -63,20 +63,20 @@ WORKING_DIR = '../../../../example_data/tool_working_dir'
 
 ALEXNET_TEST_PARAMS = TestData(BUBBLE_BALLOONS_DATASET_ROOT,
                                os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
-                               AlexNetWrapper.get_name(),
+                               AlexNetWrapper.tag,
                                {"checkpoint_path": '../../../../pretrained_weights/embedders/AlexNet_BalloonsBubbles.pth',
                                 "model_labels": "[bubble, balloon]"},
                                0.63)
 
 TIMM_DENSNET_TEST_PARAMS = TestData(BUBBLE_BALLOONS_DATASET_ROOT,
                                     os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
-                                    TimmResnetWrapper.get_name(),
+                                    TimmResnetWrapper.tag,
                                     {"model_checkpoint": 'densenet121'},
                                     0.68)
 
 TIMM_RESNET_TEST_PARAMS = TestData(BUBBLE_BALLOONS_DATASET_ROOT,
                                    os.path.join(WORKING_DIR, 'BalloonsBubbles/BalloonsBubbles.meta.pkl'),
-                                   TimmResnetWrapper.get_name(),
+                                   TimmResnetWrapper.tag,
                                    {"model_checkpoint": 'resnet34'},
                                    0.68)
 
@@ -84,13 +84,13 @@ DOGS_CATS_DATASET_ROOT = '../../../../example_data/datasets/DogsCats'
 
 TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS = TestData(DOGS_CATS_DATASET_ROOT,
                                                       os.path.join(WORKING_DIR, 'DogsCats/DogsCats.meta.pkl'),
-                                                      TimmResnetWrapper.get_name(),
+                                                      TimmResnetWrapper.tag,
                                                       {"model_checkpoint": 'resnet34'},
                                                       0.46)
 
 TIMM_PRETRAINED_TEST_PARAMS = TestData('/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/DogsCats',
                                        '/home/vlasova/Desktop/NIR/NIR/OoDTool/example_data/DogsCats/oodsession_0/DogsCats.meta.pkl',
-                                       TimmResnetWrapper.get_name(),
+                                       TimmResnetWrapper.tag,
                                        {'model_checkpoint': 'densenet121',
                                         'model_labels': 'Dog, Cat',
                                         'checkpoint_path': ''},

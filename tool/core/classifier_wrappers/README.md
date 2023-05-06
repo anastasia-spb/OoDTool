@@ -53,8 +53,6 @@ When experimenting with adaptive gradient optimizers, such as Adam or AdamW, wei
 shall be selected from different range.
 
 
-https://pytorch.org/docs/stable/generated/torch.optim.SGD.html
-
 ## References
 <a id="1">[1]</a> 
 Changjian Chen and Jun Yuan and Yafeng Lu and Yang Liu and Hang Su and Songtao Yuan and Shixia Liu (2020). 

@@ -1,6 +1,6 @@
 # Distance between embeddings
 
-
+This module provides functionality for calculation pairwise distances between samples.
 
 ## Usage
 

@@ -1,6 +1,6 @@
 # OoD Score (Entropy)
 
-
+The OoD score of each sample is the entropy of the averaged probability distribution of all classifiers [[1]](#1)
 
 ## Usage
 

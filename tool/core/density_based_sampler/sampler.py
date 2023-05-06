@@ -19,11 +19,12 @@ class DensityBasedSampler:
                                 on=data_types.RelativePathType.name(), how='inner')
 
     def __save(self) -> str:
+        self.data_df.drop(columns=[data_types.OoDScoreType.name()])
         full_path = os.path.join(self.output_dir, self.file_name)
         self.data_df.to_pickle(full_path)
         return full_path
 
-    def fit(self, n_samples=300, use_confidence_from_file=True, with_random_select=True) -> str:
+    def fit(self, n_samples=300, use_confidence_from_file=False, with_random_select=True) -> str:
         embeddings = self.data_df[data_types.EmbeddingsType.name()].tolist()
         embeddings = np.array(embeddings, dtype=np.dtype('float64'))
         ood_score = self.data_df[data_types.OoDScoreType.name()].tolist()

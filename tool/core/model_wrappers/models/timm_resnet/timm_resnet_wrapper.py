@@ -54,6 +54,7 @@ class TimmResnetEmbedder(torch.nn.Module):
 
 class TimmResnetWrapper(IModel):
     parameters = TimmWrapperParameters()
+    tag = "TimmDSRSNet"
 
     def __init__(self, device, **kwargs):
         super().__init__()

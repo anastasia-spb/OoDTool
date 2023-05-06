@@ -23,6 +23,7 @@ class RegnetWrapperParameters:
 
 class RegnetWrapper(IModel):
     parameters = RegnetWrapperParameters()
+    tag = "RegNet"
 
     def __init__(self, device, **kwargs):
         super().__init__()

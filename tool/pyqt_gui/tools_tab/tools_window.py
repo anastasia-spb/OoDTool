@@ -11,6 +11,7 @@ from tool.pyqt_gui.tools_tab.embedder_widget.embedder_frame import EmbedderFrame
 from tool.pyqt_gui.tools_tab.projector_widget.projector_widget import ProjectorFrame
 from tool.pyqt_gui.paths_settings_frame import PathsSettingsFrame
 from tool.pyqt_gui.tools_tab.distance_widget.distance_widget import DistanceFrame
+from tool.pyqt_gui.tools_tab.sampler_widget.sampler_widget import SamplerFrame
 
 
 class LogoFrame(QWidget):
@@ -63,6 +64,9 @@ class ToolsWindow(QWidget):
         self.distance_frame = DistanceFrame(self)
         self.bottom_right_layout.addWidget(self.distance_frame)
 
+        self.sampler_frame = SamplerFrame(self)
+        self.bottom_right_layout.addWidget(self.sampler_frame)
+
         self.bottom_layout.addLayout(self.bottom_right_layout)
         self.layout.addLayout(self.bottom_layout)
 
@@ -71,6 +75,7 @@ class ToolsWindow(QWidget):
         self.common_settings_frame.ood_settings_changed_signal.connect(self.widget_2.ood_settings_changed)
         self.common_settings_frame.ood_settings_changed_signal.connect(self.projector_frame.ood_settings_changed)
         self.common_settings_frame.ood_settings_changed_signal.connect(self.distance_frame.ood_settings_changed)
+        self.common_settings_frame.ood_settings_changed_signal.connect(self.sampler_frame.ood_settings_changed)
 
         self.common_settings_frame.emit_settings()
 

@@ -19,8 +19,8 @@ from tool.core.model_wrappers.models.timm_resnet.timm_resnet_wrapper import Timm
 from tool.core.model_wrappers.models.regnet.regnet_wrapper import RegnetWrapper
 from tool.core.model_wrappers.overlay_heatmap import overlay_heatmap
 
-MODEL_WRAPPERS = {AlexNetWrapper.get_name(): AlexNetWrapper,
-                  TimmResnetWrapper.get_name(): TimmResnetWrapper}
+MODEL_WRAPPERS = {AlexNetWrapper.tag: AlexNetWrapper,
+                  TimmResnetWrapper.tag: TimmResnetWrapper}
 
 
 class EmbedderPipeline:

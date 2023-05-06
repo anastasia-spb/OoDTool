@@ -41,7 +41,7 @@ class ClassifierParamsFrame(QWidget):
         outer_frame_layout.addLayout(close_button_layout)
 
         kwargs_line = QTextEdit()
-        kwargs_line.setMaximumHeight(150)
+        kwargs_line.setMaximumHeight(50)
         kwargs_line.setText(input_hint)
 
         outer_frame_layout.addWidget(kwargs_line)

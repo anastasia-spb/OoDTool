@@ -15,6 +15,7 @@ from tool.pyqt_gui.paths_settings import PathsSettings
 from tool.pyqt_gui.paths_settings_frame import PathsSettingsFrame
 from tool.pyqt_gui.ood_entropy_tab.classifier_widget.classifier_window import ClassifierFrame
 from tool.pyqt_gui.qt_utils import helpers
+from tool.pyqt_gui.tools_tab.tools_window import LogoFrame
 
 
 class EmbeddingsFilesFrame(QFrame):
@@ -28,7 +29,7 @@ class EmbeddingsFilesFrame(QFrame):
         self.checkboxes = []
 
         self.setFrameShape(QFrame.StyledPanel)
-        # self.setMaximumHeight(200)
+        self.setMaximumHeight(200)
 
         self.layout = QVBoxLayout()
         self.layout.setSpacing(0)
@@ -44,6 +45,9 @@ class EmbeddingsFilesFrame(QFrame):
             select_file_box.setChecked(True)
             self.checkboxes.append(select_file_box)
             self.layout.addWidget(self.checkboxes[-1], alignment=Qt.AlignmentFlag.AlignTop)
+
+        text_empty = QLabel("   ", self)
+        self.layout.addWidget(text_empty, alignment=Qt.AlignmentFlag.AlignTop)
 
         text = QLabel("Select file GT for train", self)
         self.layout.addWidget(text, alignment=Qt.AlignmentFlag.AlignTop)
@@ -138,24 +142,54 @@ class OoDEntropyWindow(QWidget):
     def __init__(self, parent):
         super(OoDEntropyWindow, self).__init__(parent)
 
-        self.layout = QHBoxLayout()
+        self.layout = QVBoxLayout()
+
+        # Layout for train
+        self.upper_layout = QHBoxLayout()
 
         self.left_layout = QVBoxLayout()
 
+        logo_frame = LogoFrame(self)
+        self.left_layout.addWidget(logo_frame, alignment=Qt.AlignmentFlag.AlignTop)
+
         self.common_settings_frame = PathsSettingsFrame(self)
-        self.common_settings_frame.setMaximumHeight(150)
-        self.left_layout.addWidget(self.common_settings_frame)
+        self.common_settings_frame.setMaximumHeight(200)
+        self.left_layout.addWidget(self.common_settings_frame, alignment=Qt.AlignmentFlag.AlignTop)
 
         self.embeddings_file_frame = EmbeddingsFilesFrame(self)
-        self.left_layout.addWidget(self.embeddings_file_frame)
+        self.left_layout.addWidget(self.embeddings_file_frame, alignment=Qt.AlignmentFlag.AlignTop)
 
-        ood_eval_frame = OoDFromConfig(self)
-        self.left_layout.addWidget(ood_eval_frame)
-
-        self.layout.addLayout(self.left_layout)
+        self.upper_layout.addLayout(self.left_layout)
 
         self.ood_frame = ClassifierFrame(self)
-        self.layout.addWidget(self.ood_frame)
+        self.upper_layout.addWidget(self.ood_frame, alignment=Qt.AlignmentFlag.AlignTop)
+
+        self.layout.addLayout(self.upper_layout)
+
+        # self.layout.addSpacing(10)
+
+        # Layout for eval
+        empty_frame = QFrame(self)
+        empty_frame.setMinimumHeight(10)
+        empty_frame.setMaximumHeight(10)
+
+        self.layout.addWidget(empty_frame)
+
+        empty_frame_styled = QFrame(self)
+        empty_frame_styled.setFrameShape(QFrame.StyledPanel)
+        empty_frame_styled.setMinimumHeight(5)
+        empty_frame_styled.setMaximumHeight(5)
+
+        self.layout.addWidget(empty_frame_styled)
+
+        eval_text = QLabel("Evaluation from pretrained config", self)
+        eval_text.setStyleSheet("font-weight: bold")
+        self.layout.addWidget(eval_text, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        ood_eval_frame = OoDFromConfig(self)
+        ood_eval_frame.setMinimumWidth(400)
+        ood_eval_frame.setMinimumHeight(250)
+        self.layout.addWidget(ood_eval_frame, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Add subscription of all widgets to common setting
         self.common_settings_frame.ood_settings_changed_signal.connect(self.embeddings_file_frame.ood_settings_changed)
