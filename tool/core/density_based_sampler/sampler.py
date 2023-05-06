@@ -10,13 +10,12 @@ from tool.core import data_types
 class DensityBasedSampler:
     def __init__(self, embeddings_file, ood_score_file):
         self.output_dir, file_name = os.path.split(embeddings_file)
-        self.file_name = "".join((file_name.strip(".emb.pkl"), ".semb.pkl"))
+        self.file_name = "".join((file_name.strip(".emb.pkl"), ".sampled.emb.pkl"))
 
         embeddings_df = pd.read_pickle(embeddings_file)
         ood_df = pd.read_pickle(ood_score_file)
-        self.data_df = pd.merge(ood_df, embeddings_df[[data_types.RelativePathType.name(),
-                                                       data_types.EmbeddingsType.name(),
-                                                       data_types.ClassProbabilitiesType.name()]],
+        self.data_df = pd.merge(embeddings_df, ood_df[[data_types.RelativePathType.name(),
+                                                       data_types.OoDScoreType.name()]],
                                 on=data_types.RelativePathType.name(), how='inner')
 
     def __save(self) -> str:
@@ -24,7 +23,7 @@ class DensityBasedSampler:
         self.data_df.to_pickle(full_path)
         return full_path
 
-    def fit(self, n_samples=300, use_confidence_from_file=True, with_random_select=False) -> str:
+    def fit(self, n_samples=300, use_confidence_from_file=True, with_random_select=True) -> str:
         embeddings = self.data_df[data_types.EmbeddingsType.name()].tolist()
         embeddings = np.array(embeddings, dtype=np.dtype('float64'))
         ood_score = self.data_df[data_types.OoDScoreType.name()].tolist()
@@ -44,7 +43,7 @@ class DensityBasedSampler:
     @classmethod
     def __sample_probability(cls, density: float, ood_score: float, confidence: float) -> float:
         # We want to select samples with higher radius, ood_score and confidence
-        return ood_score*density
+        return ood_score*density*confidence
 
     def _fit_samples(self, embeddings: np.ndarray, entropy: np.ndarray, confidence: np.ndarray,
                      n_samples, with_random_select, knn=50) -> np.ndarray:

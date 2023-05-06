@@ -20,7 +20,10 @@ def create_new_session_folder(dataset_root_path):
         d = os.path.join(dataset_root_path, file)
         if os.path.isdir(d) and file.startswith("oodsession_"):
             _, session_id = file.split("_", 1)
-            existing_sessions.append(int(session_id))
+            try:
+                existing_sessions.append(int(session_id))
+            except ValueError:
+                continue
     next_session = 0
     if len(existing_sessions) > 0:
         existing_sessions.sort()

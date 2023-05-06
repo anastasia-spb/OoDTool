@@ -28,9 +28,6 @@ class ClassifierPipeline:
     def parameters_hint(self):
         return self.classifier.parameters_hint()
 
-    def check_input_kwargs(self, kwargs):
-        return self.classifier.check_input_kwargs(kwargs)
-
     @staticmethod
     def prepare_data(embedding_file, use_gt_for_training, probabilities_file, inference_mode):
         data_df = pd.read_pickle(embedding_file)
@@ -84,7 +81,7 @@ class ClassifierPipeline:
         return self.probabilities_df
 
     def classify(self, embeddings_file: str, output_dir: str, use_gt_for_training: bool,
-                 probabilities_file: Optional[str], kwargs: List[dict], checkpoint: Optional[str] = None) -> (str, str):
+                 probabilities_file: Optional[str], weight_decay: List[float], checkpoint: Optional[str] = None) -> (str, str):
         """Walks through dataset directory and stores metadata information about images into <dataset_name>.meta.pkl file.
             Args:
                 embeddings_file: List of all files with embeddings
@@ -92,7 +89,7 @@ class ClassifierPipeline:
                 use_gt_for_training: If GT labels shall be used for training or predictions from probabilities_file.
                 probabilities_file: File with probabilities, which shall be used for training. Required only if
                                     use_gt_for_training is set to False
-                kwargs: Classifier arguments
+                weight_decay: Classifier arguments
                 checkpoint: If checkpoint file is valid, then train part will be skipped
             Returns:
                 Absolute path to <dataset_name>.clf.pkl file or None if input data are invalid.
@@ -112,8 +109,8 @@ class ClassifierPipeline:
                                                                              inference_mode=inference_mode)
         self.probabilities_df[data_types.RelativePathType.name()] = relative_paths
         checkpoints = []
-        for i, params in enumerate(kwargs):
-            probabilities = self.classifier.run(X_train, y_train, X, params, num_classes, output_dir, model_weights)
+        for i, wd in enumerate(weight_decay):
+            probabilities = self.classifier.run(X_train, y_train, X, wd, num_classes, output_dir, model_weights)
             pretrained_model = self.classifier.get_checkpoint()
             if pretrained_model is not None:
                 checkpoints.append(pretrained_model)
@@ -124,7 +121,7 @@ class ClassifierPipeline:
         return self.__store(output_dir, True, checkpoints, embeddings_file, probabilities_file)
 
     def train_and_classify(self, embeddings_files: List[str], output_dir: str, use_gt_for_training: bool,
-                           probabilities_file: Optional[str], kwargs: List[dict]) -> List[str]:
+                           probabilities_file: Optional[str], weight_decays: List[float]) -> List[str]:
 
         if len(embeddings_files) < 1:
             return []
@@ -133,7 +130,8 @@ class ClassifierPipeline:
         config_files = []
 
         for file in embeddings_files:
-            output_file, config_file = self.classify(file, output_dir, use_gt_for_training, probabilities_file, kwargs)
+            output_file, config_file = self.classify(file, output_dir, use_gt_for_training, probabilities_file,
+                                                     weight_decays)
             output_files.append(output_file)
             config_files.append(config_file)
 
@@ -156,7 +154,7 @@ class ClassifierPipeline:
         self.probabilities_df[data_types.RelativePathType.name()] = relative_paths
         checkpoints = []
         for i, checkpoint in enumerate(weights):
-            probabilities = self.classifier.run(None, None, X, dict(), num_classes, output_dir, checkpoint)
+            probabilities = self.classifier.run(None, None, X, 0.0, num_classes, output_dir, checkpoint)
             pretrained_model = self.classifier.get_checkpoint()
             if pretrained_model is not None:
                 checkpoints.append(pretrained_model)

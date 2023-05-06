@@ -18,9 +18,9 @@ from tool.core.model_wrappers.models.alexnet.train_and_test.utils import train_m
 def train_timm(
         checkpoint_path='',
         finetune=False):
-    data_dir = '/home/vlasova/datasets/TrafficLightsDVC'
-    metadata_file = '/home/vlasova/datasets/TrafficLightsDVC/oodsession_manual/PedestrianLights.meta.pkl'
-    classes = ["stop", "forward", "blinked"]
+    data_dir = '/home/vlasova/datasets/DroneBird'
+    metadata_file = '/home/vlasova/datasets/DroneBird/ood_session_train/DroneBird.meta.pkl'
+    classes = ["Drone", "Bird"]
 
     # Cuda maintenance
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
@@ -42,7 +42,7 @@ def train_timm(
     train_subset, validation_subset = random_split(train_dataset, [train_set_size, validation_set_size],
                                                    generator=torch.Generator().manual_seed(42))
 
-    batch_size = 16
+    batch_size = 32
     train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(validation_subset, batch_size=batch_size, shuffle=False)
 
@@ -53,7 +53,7 @@ def train_timm(
     lr = 5e-3
     optimizer = timm.optim.AdamP(model.parameters(), lr=lr)
     scheduler = timm.scheduler.CosineLRScheduler(optimizer,
-                                                 t_initial=num_epochs,
+                                                 t_initial=training_epochs,
                                                  cycle_decay=0.5,
                                                  lr_min=1e-6,
                                                  t_in_epochs=True,

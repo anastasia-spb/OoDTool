@@ -60,6 +60,7 @@ def train_model(model, loss_func, optimizer, train_loader, val_loader, device, e
     metrics = {"train loss": [], "valid loss": [], "valid acc": []}
     best_valid_accuracy = 0.0
     for epoch in range(1, epochs + 1):
+        print("Epoch {0}".format(epoch))
         epoch_train(model, loss_func, optimizer, train_loader, val_loader, device, metrics)
 
         if metrics["valid acc"][-1] > best_valid_accuracy:

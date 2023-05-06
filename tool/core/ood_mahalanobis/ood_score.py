@@ -1,6 +1,6 @@
 import os
 import pickle
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime
 
 import numpy as np
@@ -23,10 +23,10 @@ class OoDMahalanobisScore:
     def __init__(self):
         self.ood_df = pd.DataFrame()
 
-    def run(self, embeddings_files: List[str], use_gt_for_training: bool, output_dir: str,
+    def run(self, embeddings_file: str, use_gt_for_training: bool, output_dir: str,
             probabilities_file: Optional[str]):
         X_train, y_train, X, num_classes, relative_paths = classifier_pipeline.ClassifierPipeline.prepare_data(
-            embeddings_files=embeddings_files,
+            embedding_file=embeddings_file,
             use_gt_for_training=use_gt_for_training,
             probabilities_file=probabilities_file,
             inference_mode=False)

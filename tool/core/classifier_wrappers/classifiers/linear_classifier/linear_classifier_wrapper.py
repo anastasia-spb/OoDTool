@@ -60,19 +60,8 @@ class LinearClassifierWrapper(IClassifier):
     def parameters_hint(cls):
         return 'Weight decay (L2 reg); must be a positive float.'
 
-    @classmethod
-    def check_input_kwargs(cls, kwargs: dict):
-
-        checks = [lambda: "weight_decay" in kwargs,
-                  lambda: float(kwargs["weight_decay"]) >= 0.0]
-
-        for check in checks:
-            if not check():
-                return False
-        return True
-
     def input_hint(self):
-        return "{{'weight_decay' : '{0}'}}".format(self.weight_decay)
+        return "{0}".format(self.weight_decay)
 
     @classmethod
     def _train(cls, model, batch_size, train_dataset, valid_dataset, device, output_dir: str, max_epochs=100):
@@ -125,7 +114,7 @@ class LinearClassifierWrapper(IClassifier):
         return self.checkpoint
 
     def run(self, X_train: Optional[np.ndarray], y_train: Optional[np.ndarray],
-            X_test: np.ndarray, kwargs: dict, num_classes: int, output_dir: str,
+            X_test: np.ndarray, weight_decay: float, num_classes: int, output_dir: str,
             checkpoint: Optional[str] = None) -> np.ndarray:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         feature_dim = X_test.shape[1]
@@ -136,7 +125,8 @@ class LinearClassifierWrapper(IClassifier):
             self.checkpoint = checkpoint
             weight_decay = 0.0
         else:
-            weight_decay = float(kwargs["weight_decay"])
+            assert weight_decay >= 0.0
+            weight_decay = weight_decay
 
         model = LinearClassifier(feature_dim=feature_dim, num_classes=num_classes,
                                  weight_decay=weight_decay)

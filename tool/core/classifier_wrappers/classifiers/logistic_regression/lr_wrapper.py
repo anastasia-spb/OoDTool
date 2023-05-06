@@ -20,33 +20,23 @@ class LogisticRegressionWrapper(IClassifier):
 
     @classmethod
     def parameters_hint(cls):
-        return 'Solvers: {0}, C: Inverse of regularization strength; must be a positive float.'.format(cls.solvers)
-
-    @classmethod
-    def check_input_kwargs(cls, kwargs: dict):
-        checks = [lambda: "C" in kwargs, lambda: "solver" in kwargs,
-                  lambda: kwargs["solver"] in cls.solvers, lambda: float(kwargs["C"]) > 0.0]
-
-        for check in checks:
-            if not check():
-                return False
-        return True
+        return 'C: Inverse of regularization strength; must be a positive float.'
 
     def input_hint(self):
-        return "{{'C' : '{0}', 'solver' : '{1}' }}".format(self.c, self.solver)
+        return "{0}".format(self.c)
 
     def get_checkpoint(self):
         return self.checkpoint
 
     def run(self, X_train: Optional[np.ndarray], y_train: Optional[np.ndarray], X_test: np.ndarray,
-            kwargs: dict, num_classes: int, output_dir: str, checkpoint: Optional[str] = None) -> np.ndarray:
+            weight_decay: float, num_classes: int, output_dir: str, checkpoint: Optional[str] = None) -> np.ndarray:
+
+        assert weight_decay >= 0.0
 
         if checkpoint is not None:
             clf = joblib.load(checkpoint)
         else:
-            C = float(kwargs["C"])
-            solver = kwargs["solver"]
-            clf = LogisticRegression(random_state=42, C=C, solver=solver)
+            clf = LogisticRegression(random_state=42, C=weight_decay, solver=self.solver)
             clf.fit(X_train, y_train)
             timestamp_str = datetime.utcnow().strftime("%y%m%d_%H%M%S.%f")[:-3]
             filename = "".join((timestamp_str, ".joblib.pkl"))

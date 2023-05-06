@@ -23,12 +23,13 @@ class DistanceCalculator:
         self.output_folder = output_folder
         self.data = self.__prepare_data(embeddings_pkl)
 
-    def run(self):
+    def run(self) -> str:
         if self.method_name == 'cosine':
             self.distance_mat = self.__pdist_distance(metric='cosine')
         elif self.method_name == 'euclidian':
             self.distance_mat = self.__minkowski_distance()
         self.output_file = self.__store(self.output_folder)
+        return self.output_file
 
     def get_output_file(self):
         return self.output_file

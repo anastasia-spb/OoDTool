@@ -93,7 +93,7 @@ TIMM_PRETRAINED_TEST_PARAMS = TestData('/home/vlasova/Desktop/NIR/NIR/OoDTool/ex
                                        TimmResnetWrapper.get_name(),
                                        {'model_checkpoint': 'densenet121',
                                         'model_labels': 'Dog, Cat',
-                                        'checkpoint_path': '/home/vlasova/Desktop/NIR/NIR/OoDTool/tool/core/model_wrappers/models/timm_resnet/try.pth'},
+                                        'checkpoint_path': ''},
                                        0.46)
 
 

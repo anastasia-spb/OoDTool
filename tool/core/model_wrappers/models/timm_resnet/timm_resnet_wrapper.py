@@ -87,7 +87,7 @@ class TimmResnetWrapper(IModel):
 
     @classmethod
     def get_name(cls):
-        return cls.__name__
+        return "".join((cls.__name__, "_", cls.parameters.model_checkpoint))
 
     def get_model_labels(self):
         return self.labels_dict

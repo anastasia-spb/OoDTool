@@ -10,7 +10,6 @@ from tool.core import data_types
 
 def get_k_neighbours(info: ImageInfo, k: int):
     images_paths = []
-    # TODO: move file reading into outer class
     distances_pkl = find_pkl.get_distances_file(info.metadata_dir)
     if not os.path.isfile(distances_pkl):
         return images_paths

@@ -1,13 +1,11 @@
 import os
-import ast
 
 from PyQt5.QtWidgets import (
     QPushButton,
     QVBoxLayout,
     QHBoxLayout,
     QFrame,
-    QLineEdit,
-    QComboBox, QScrollArea, QWidget, QTextEdit, QMessageBox
+    QWidget, QTextEdit, QMessageBox
 )
 
 from PyQt5.QtGui import QIcon
@@ -73,10 +71,10 @@ class ClassifierParamsFrame(QWidget):
         for _, classifier in self.classifiers_instances.items():
             kwargs_line = classifier.findChild(QTextEdit)
             if kwargs_line is not None:
-                kwargs = dict()
+                weight_decay = 0.0
                 try:
-                    kwargs = ast.literal_eval(kwargs_line.toPlainText())
+                    weight_decay = float(kwargs_line.toPlainText())
                 except SyntaxError:
                     QMessageBox.critical(self, "", "Parameters couldn't be parsed")
-                parameters.append(kwargs)
+                parameters.append(weight_decay)
         return parameters

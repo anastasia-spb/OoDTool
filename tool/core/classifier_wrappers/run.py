@@ -1,6 +1,5 @@
 import argparse
 import os
-import ast
 
 from tool.core.classifier_wrappers import classifier_pipeline
 from tool.core.classifier_wrappers.classifier_pipeline import CLASSIFIER_WRAPPERS
@@ -24,27 +23,16 @@ def train_classifiers():
 
     clf = classifier_pipeline.ClassifierPipeline(classifier_tag)
 
-    kwargs = []
-
-    print("Input ensemble size: ")
-    ensemble_size = int(input())
-
-    i = 0
-    print("Enter input arguments in format: {0}".format(clf.input_hint()))
-    while i < ensemble_size:
-        kwargs_line = input()
-        try:
-            kwargs.append(ast.literal_eval(kwargs_line))
-            i += 1
-        except SyntaxError:
-            print("Parameters couldn't be parsed")
-            continue
+    print("Enter weight decay values separated by space: ")
+    weight_decays = input()
+    weight_decays = weight_decays.split(' ')
+    weight_decays_values = [float(value) for value in weight_decays]
 
     result = clf.train_and_classify(embeddings_files=args.embeddings,
                                     output_dir=output_dir,
                                     use_gt_for_training=use_gt_for_training,
                                     probabilities_file=args.probabilities,
-                                    kwargs=kwargs)
+                                    weight_decays=weight_decays_values)
 
     print(result)
 

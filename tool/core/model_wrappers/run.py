@@ -13,7 +13,7 @@ def run():
     parser.add_argument('-meta', '--metadata_file', default='', required=True)
     parser.add_argument('-d', '--dataset_dir', default='', required=True)
     parser.add_argument('--grads', action='store_true')
-    parser.set_defaults(grads=True)
+    parser.set_defaults(grads=False)
 
     print("Select model wrapper from {0}".format(MODEL_WRAPPERS.keys()))
     embedder_name = input()

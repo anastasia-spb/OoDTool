@@ -12,7 +12,7 @@ def test_ood_mahalanobis_pipeline(use_gt_for_training):
 
     pipeline = OoDMahalanobisScore()
     test_file = 'test_data/TimmResnetWrapperImageNetVegetables230427_145051.emb.pkl'
-    _ = pipeline.run([test_file], use_gt_for_training=use_gt_for_training, output_dir=metadata_folder,
+    _ = pipeline.run(test_file, use_gt_for_training=use_gt_for_training, output_dir=metadata_folder,
                      probabilities_file=test_file)
     ood_df = pipeline.get_ood_df()
     plt.hist(ood_df[data_types.types.OoDScoreType.name()], density=True, bins=30)
