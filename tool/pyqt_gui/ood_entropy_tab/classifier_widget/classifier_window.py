@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal
 
 from tool.core.ood_entropy.ood_score import OoDScore
-from tool.core.classifier_wrappers.classifier_pipeline import CLASSIFIER_WRAPPERS
+from tool.core.classifier_wrappers.classifiers.lr_wrapper import SUPPORTED_CLASSIFIERS
 from tool.pyqt_gui.ood_entropy_tab.classifier_widget.classifier_thread import ClassifierThread
 from tool.pyqt_gui.ood_entropy_tab.classifier_widget.classifier_parameters_frame import ClassifierParamsFrame
 from tool.pyqt_gui.paths_settings import PathsSettings
@@ -32,7 +32,7 @@ class ClassifierFrame(QFrame):
         self.settings = PathsSettings()
         self.ood_output = '...'
 
-        self.selected_classifier_tag = list(CLASSIFIER_WRAPPERS.keys())[0]
+        self.selected_classifier_tag = SUPPORTED_CLASSIFIERS[0]
         self.classifier = ClassifierThread(self.selected_classifier_tag,
                                            embeddings_files=[],
                                            output_dir='',
@@ -67,7 +67,7 @@ class ClassifierFrame(QFrame):
         model_layout = QHBoxLayout()
         models_combobox = QComboBox()
         models_combobox.currentTextChanged.connect(self.__on_model_type_change)
-        models_combobox.addItems(CLASSIFIER_WRAPPERS.keys())
+        models_combobox.addItems(SUPPORTED_CLASSIFIERS)
         model_layout.addWidget(models_combobox)
         self.layout.insertLayout(0, model_layout)
 

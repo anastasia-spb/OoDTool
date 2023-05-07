@@ -7,26 +7,23 @@ from typing import List, Optional
 
 from tool.core import data_types
 from tool.core.utils import data_helpers
-from tool.core.classifier_wrappers.classifiers.logistic_regression.lr_wrapper import LogisticRegressionWrapper
-from tool.core.classifier_wrappers.classifiers.linear_classifier.linear_classifier_wrapper import \
-    LinearClassifierWrapper
+from tool.core.classifier_wrappers.classifiers.lr_wrapper import LogisticRegressionWrapper
 from tool.core.classifier_wrappers.classifier_pipeline_config import store_pipeline_config, ClfConfig, \
     unite_configurations
-
-CLASSIFIER_WRAPPERS = {LogisticRegressionWrapper.tag: LogisticRegressionWrapper,
-                       LinearClassifierWrapper.tag: LinearClassifierWrapper}
 
 
 class ClassifierPipeline:
     def __init__(self, classifier_tag: str):
         self.probabilities_df = pd.DataFrame()
-        self.classifier = CLASSIFIER_WRAPPERS[classifier_tag]()
+        self.classifier = LogisticRegressionWrapper(classifier_tag)
 
-    def input_hint(self):
-        return self.classifier.input_hint()
+    @classmethod
+    def input_hint(cls):
+        return LogisticRegressionWrapper.input_hint()
 
-    def parameters_hint(self):
-        return self.classifier.parameters_hint()
+    @classmethod
+    def parameters_hint(cls):
+        return LogisticRegressionWrapper.parameters_hint()
 
     @staticmethod
     def prepare_data(embedding_file, use_gt_for_training, probabilities_file, inference_mode):
@@ -56,7 +53,6 @@ class ClassifierPipeline:
             return None, None, embeddings, num_classes, data_df[data_types.RelativePathType.name()]
 
         X_train, y_train = embeddings[train_indices, :], y[train_indices]
-        num_classes = len(data_df[data_types.LabelsType.name()][0])
         return X_train, y_train, embeddings, num_classes, data_df[data_types.RelativePathType.name()]
 
     def __store(self, output_folder: str, store_config_file: bool,
@@ -64,13 +60,13 @@ class ClassifierPipeline:
                 probabilities_file: Optional[str] = None) -> (str, str):
         timestamp_str = datetime.utcnow().strftime("%y%m%d_%H%M%S.%f")[:-3]
         # Store clf file
-        name = "".join((self.classifier.tag, "_", timestamp_str, '.clf.pkl'))
+        name = "".join((self.classifier.selected_model, "_", timestamp_str, '.clf.pkl'))
         file = os.path.join(output_folder, name)
         self.probabilities_df.to_pickle(file)
 
         # Store configuration
         if store_config_file:
-            config_file = store_pipeline_config(embeddings_file, probabilities_file, self.classifier.tag, checkpoints,
+            config_file = store_pipeline_config(embeddings_file, probabilities_file, self.classifier.selected_model, checkpoints,
                                                 output_folder)
         else:
             config_file = None
@@ -98,7 +94,7 @@ class ClassifierPipeline:
         if not os.path.isfile(embeddings_file):
             return ''
 
-        inference_mode = (checkpoint is not None) and os.path.isfile(checkpoint) and checkpoint.endswith('.ckpt')
+        inference_mode = (checkpoint is not None) and os.path.isfile(checkpoint) and checkpoint.endswith('.joblib.pkl')
         model_weights = None
         if inference_mode:
             model_weights = checkpoint
@@ -110,7 +106,7 @@ class ClassifierPipeline:
         self.probabilities_df[data_types.RelativePathType.name()] = relative_paths
         checkpoints = []
         for i, wd in enumerate(weight_decay):
-            probabilities = self.classifier.run(X_train, y_train, X, wd, num_classes, output_dir, model_weights)
+            probabilities = self.classifier.run(X_train, y_train, X, wd, output_dir, model_weights)
             pretrained_model = self.classifier.get_checkpoint()
             if pretrained_model is not None:
                 checkpoints.append(pretrained_model)
@@ -140,7 +136,7 @@ class ClassifierPipeline:
 
     def classify_from_config(self, embeddings_file: str, clf_config: dict, output_dir: str) -> str:
         config = ClfConfig(clf_config)
-        self.classifier = CLASSIFIER_WRAPPERS[config.get_tag()]()
+        self.classifier = LogisticRegressionWrapper(config.get_tag())
         weights = config.get_weights()
 
         if not os.path.isfile(embeddings_file):
@@ -154,7 +150,7 @@ class ClassifierPipeline:
         self.probabilities_df[data_types.RelativePathType.name()] = relative_paths
         checkpoints = []
         for i, checkpoint in enumerate(weights):
-            probabilities = self.classifier.run(None, None, X, 0.0, num_classes, output_dir, checkpoint)
+            probabilities = self.classifier.run(None, None, X, 0.0, output_dir, checkpoint)
             pretrained_model = self.classifier.get_checkpoint()
             if pretrained_model is not None:
                 checkpoints.append(pretrained_model)

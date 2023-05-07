@@ -2,7 +2,7 @@ import argparse
 import os
 
 from tool.core.classifier_wrappers import classifier_pipeline
-from tool.core.classifier_wrappers.classifier_pipeline import CLASSIFIER_WRAPPERS
+from tool.core.classifier_wrappers.classifiers.lr_wrapper import SUPPORTED_CLASSIFIERS
 
 
 def train_classifiers():
@@ -18,7 +18,7 @@ def train_classifiers():
 
     output_dir, _ = os.path.split(embeddings[0])
 
-    print("Choose classifier type from: {0}".format(CLASSIFIER_WRAPPERS.keys()))
+    print("Choose classifier type from: {0}".format(SUPPORTED_CLASSIFIERS))
     classifier_tag = input()
 
     clf = classifier_pipeline.ClassifierPipeline(classifier_tag)

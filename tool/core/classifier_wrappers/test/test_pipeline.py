@@ -8,12 +8,12 @@ from tool.core.classifier_wrappers import classifier_pipeline
 from tool.core.utils import data_helpers
 
 from tool.core import data_types
-from tool.core.classifier_wrappers.test import test_data_type, linear_clf_test_data, logistic_regression_test_cases
+from tool.core.classifier_wrappers.test import test_data_type, logistic_regression_test_cases
 
 
 def get_y_actual(metadata_file: str):
     meta_df = pd.read_pickle(metadata_file)
-    labels = meta_df[data_types.LabelsType.name()][0]
+    labels = data_helpers.get_labels(meta_df)
     return meta_df.apply(lambda row: labels.index(row[data_types.LabelType.name()]), axis=1).values
 
 
@@ -24,7 +24,7 @@ def test(test_data: test_data_type.TestData):
 
     clf = classifier_pipeline.ClassifierPipeline(test_data.classifier_tag)
     _ = clf.classify(test_data.embeddings_pkl, metadata_folder, test_data.use_gt,
-                     test_data.pkl_with_probabilities, test_data.weight_decays)
+                     test_data.pkl_with_probabilities, test_data.weight_decays, test_data.checkpoint)
     predictions_df = clf.get_probabilities_df()
 
     predictions_columns = data_helpers.get_columns_which_start_with(predictions_df,
@@ -43,5 +43,4 @@ def test(test_data: test_data_type.TestData):
 
 
 if __name__ == "__main__":
-    linear_clf_test_data.linear_classifier_test(test)
-    # logistic_regression_test_cases.lr_classifier_test(test)
+    logistic_regression_test_cases.lr_classifier_test(test)

@@ -31,7 +31,7 @@ def run_ood_pipeline(output_folder: str, config_file: str) -> str:
 
 def test_ood_pipeline():
     output_folder = "./"
-    config_file = '/home/vlasova/datasets/DroneBird/oodsession_1/ood_pipeline.config.json'
+    config_file = './test/test_data/ood_pipeline.config.json'
     resulting_file = run_ood_pipeline(output_folder, config_file)
     ood_df = pd.read_pickle(resulting_file)
     plt.hist(ood_df[data_types.types.OoDScoreType.name()], density=True, bins=30)

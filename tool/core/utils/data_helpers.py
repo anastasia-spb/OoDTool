@@ -26,7 +26,7 @@ def merge_data_files(files: List[str]) -> (pd.DataFrame, List[str]):
 def get_labels(data_df: pd.DataFrame) -> List[str]:
     if data_df.empty:
         return []
-    return data_df[data_types.LabelsType.name()][0]
+    return data_df[data_types.LabelsType.name()].iloc[0]
 
 
 def get_predictions(probabilities_file: str) -> np.ndarray:
@@ -36,9 +36,7 @@ def get_predictions(probabilities_file: str) -> np.ndarray:
 
 
 def get_number_of_classes(data_df: pd.DataFrame) -> int:
-    if data_df.empty:
-        return 0
-    return len(data_df[data_types.LabelsType.name()][0])
+    return len(get_labels(data_df))
 
 
 def string_from_kwargs(tag, kwargs: dict):

@@ -37,20 +37,15 @@ Regularization is one of the common approaches to avoid overfitting - by prevent
 
 ScikitLearn Logistic Regression uses L2 Regularization by default (so OoD tool).
 For LR Classifier ensemble you shall vary parameter `C`, which is inverse of regularization strength.
-Smaller values specify stronger regularization. It's recommended to select values from {10e-6 to 10e6} with step
+Smaller values specify stronger regularization. It's recommended to select values from {10e-5 to 10e5} with step
 proportional to the amount of classifiers inside ensemble to better cover the parameter space.
-For more details, please see [[1]](#1)
+For more details, please see [[1]](#1).
+You can also experiment with different solvers such as liblinear, newton-cg or lbfgs.
 
-LinearClassifier implementation differs from LogisticRegression approach in two major ways:
-it can be used for multilabel classification and uses stochastic gradient descent 
-<a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.softmax.html"> SGD </a> learning.
-Regularization strength is controlled by `weight_decay` parameter. 
-The parameter for weight decay is set on a logarithmic scale between 0 and 0.1 (0.1, 0.01, 0.001, ...).
-L2 regularization and weight decay regularization are equivalent for standard stochastic gradient descent 
-(when rescaled by the learning rate). 
-
-When experimenting with adaptive gradient optimizers, such as Adam or AdamW, weight decay parameter
-shall be selected from different range.
+Fo multiclass problems use <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html"> SGDClassifier </a>.
+Set different values of `alpha` - constant that multiplies the regularization term.
+The higher the value, the stronger the regularization. 
+Recommended values range is set on a logarithmic scale between 0 and inf (0.1, 0.01, 0.001, ...).
 
 
 ## References
