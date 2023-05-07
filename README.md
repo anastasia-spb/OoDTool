@@ -36,7 +36,8 @@ Or provide path to pretrained checkpoint. Gradients calculation and storage are 
 would like to see saliency maps for chosen model. Otherwise, uncheck it, since it slows down inference significantly.
 All generated `.emb.pkl` files will be stored in current session folder.
 
-![](readme_data/embeddings.mp4)
+![](readme_data/embeddings.gif)
+https://github.com/anastasia-spb/OoDTool/blob/main/readme_data/embeddings.mp4
 
 
 ### Get OoDScore
@@ -44,14 +45,16 @@ All generated `.emb.pkl` files will be stored in current session folder.
 In the "OoD Tune" tab you can create you own ensemble of linear classifiers, set weight decays and calculate
 ood score for each sample in your dataset.
 
-![](readme_data/entropy_score.mp4)
+![](readme_data/entropy_score.gif)
+https://github.com/anastasia-spb/OoDTool/blob/main/readme_data/entropy_score.mp4
 
 ### Pairwise distances and 2D projection
 
 In your session folder leave only one `.emb.pkl` file. You can put other files in a new folder.
 Come back to "Tools" tab, select pdist and projection methods and run widgets.
 
-![](readme_data/pdist_and_projection.mp4)
+![](readme_data/pdist_and_projection.gif)
+https://github.com/anastasia-spb/OoDTool/blob/main/readme_data/pdist_and_projection.mp4
 
 ### Sampler
 
@@ -61,7 +64,8 @@ Select desired number of samples and run sampler widget. Open your session folde
 origin `.emb.pkl` into a folder.
 Come back to "Tools" tab, select pdist and projection methods and run widgets.
 
-![](readme_data/sampled_pdist_and_projection.mp4)
+![](readme_data/sampled_pdist_and_projection.gif)
+https://github.com/anastasia-spb/OoDTool/blob/main/readme_data/sampled_pdist_and_projection.mp4
 
 ### OoD Images
 
@@ -74,11 +78,13 @@ e.g. that for red drones we might get wrong classification results with high con
 OoD score as well.
 
 
-![](readme_data/visualize.mp4)
+![](readme_data/visualize.gif)
+https://github.com/anastasia-spb/OoDTool/blob/main/readme_data/visualize.mp4
 
 ### Plot
 
 Plot projected embeddings, highlight images with high OoD score, 
 visualize train/test sets overlap, show misclassified samples if you `.emb.pkl` contains meaningful predicted probabilities.
 
-![](readme_data/plot.mp4)
+![](readme_data/plot.gif)
+https://github.com/anastasia-spb/OoDTool/blob/main/readme_data/plot.mp4
