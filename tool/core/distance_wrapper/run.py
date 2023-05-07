@@ -16,7 +16,7 @@ def get_ood():
     calculator = DistanceCalculator(method_name=args.method,
                                     embeddings_pkl=embeddings,
                                     output_folder=output_folder)
-    result = calculator.run()
+    result = calculator.get_pdist()
     print(result)
 
 

@@ -23,7 +23,7 @@ class DistanceCalculator:
         self.output_folder = output_folder
         self.data = self.__prepare_data(embeddings_pkl)
 
-    def run(self) -> str:
+    def get_pdist(self) -> str:
         if self.method_name == 'cosine':
             self.distance_mat = self.__pdist_distance(metric='cosine')
         elif self.method_name == 'euclidian':
@@ -102,14 +102,14 @@ def test_cosine(input_data):
     calculator = DistanceCalculator(method_name='cosine',
                                     embeddings_pkl=input_data,
                                     output_folder="./")
-    calculator.run()
+    calculator.get_pdist()
 
 
 def test_euclidean(input_data):
     calculator = DistanceCalculator(method_name='euclidian',
                                     embeddings_pkl=input_data,
                                     output_folder="./")
-    calculator.run()
+    calculator.get_pdist()
 
 
 if __name__ == "__main__":

@@ -38,7 +38,7 @@ class ClassifierFrame(QFrame):
                                            output_dir='',
                                            use_gt_for_training=True,
                                            probabilities_file=None,
-                                           kwargs=[])
+                                           weight_decays=[])
 
         self.setFrameShape(QFrame.StyledPanel)
         self.setAttribute(Qt.WA_StyledBackground, True)
@@ -78,7 +78,7 @@ class ClassifierFrame(QFrame):
                                            output_dir='',
                                            use_gt_for_training=True,
                                            probabilities_file=None,
-                                           kwargs=[])
+                                           weight_decays=[])
         self.classifier_params_widget.reset(self.classifier.input_hint())
 
     def __add_evaluate_button(self):
@@ -119,7 +119,7 @@ class ClassifierFrame(QFrame):
                                            output_dir=self.settings.metadata_folder,
                                            use_gt_for_training=(embeddings_files[-1] == "Use GT"),
                                            probabilities_file=embeddings_files[-1],
-                                           kwargs=self.classifier_params_widget.get_parameters())
+                                           weight_decays=self.classifier_params_widget.get_parameters())
 
         self.classifier._signal.connect(self.signal_accept)
         self.classifier.start()

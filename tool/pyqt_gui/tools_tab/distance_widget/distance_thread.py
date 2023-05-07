@@ -13,7 +13,7 @@ class DistanceThread(QThread, DistanceCalculator):
 
     def run(self):
         try:
-            super(DistanceThread, self).run()
+            super(DistanceThread, self).get_pdist()
             self._signal.emit(0)
         except Exception as error:
             print(str(error))

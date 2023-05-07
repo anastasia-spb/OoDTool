@@ -17,4 +17,12 @@ ______________________________________________________________________
 
 ## Pipeline
 
+Scenario 1:
+I have labelled dataset and would like to visualize its projection and search for samples high OoD Score
 
+![](../../readme_data/pipeline_1.png)
+
+Scenario 2:
+I have new unlabelled data for my dataset, which was previously analyzed in OoDTool 
+
+![](../../readme_data/pipeline_2.png)
