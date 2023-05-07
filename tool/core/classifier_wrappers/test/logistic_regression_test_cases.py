@@ -6,9 +6,7 @@ from tool.core.classifier_wrappers.classifiers.logistic_regression.lr_wrapper im
 TEST_DATA = test_data_type.TestData(LogisticRegressionWrapper.tag,
                                     'test_data/ResNetDroneBird230424_191030.emb.pkl',
                                     None,
-                                    [{"C": '0.00001', "solver": 'liblinear'},
-                                     {"C": '10000.0', "solver": 'liblinear'},
-                                     {"C": '1.0', "solver": 'liblinear'}],
+                                    [0.00001, 10000.0, 1.0],
                                     use_gt=True,
                                     checkpoint=None)
 

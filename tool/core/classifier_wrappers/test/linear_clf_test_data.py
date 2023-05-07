@@ -7,30 +7,28 @@ from tool.core.classifier_wrappers.classifiers.linear_classifier.linear_classifi
 TEST_TRAIN_USE_GT = test_data_type.TestData(LinearClassifierWrapper.tag,
                                             'test_data/ResNetDroneBird230424_191030.emb.pkl',
                                             None,
-                                            [{"weight_decay": '0.000001', "checkpoint": ''},
-                                             {"weight_decay": '0.004', "checkpoint": ''},
-                                             {"weight_decay": '1.0'}],
+                                            [0.000001, 0.004, 1.0],
                                             use_gt=True,
                                             checkpoint=None)
 
 TEST_TRAIN_WD_LARGE = test_data_type.TestData(LinearClassifierWrapper.tag,
                                               'test_data/TimmResnetWrapperImageNetVegetables230427_145051.emb.pkl',
                                               'test_data/TimmResnetWrapperImageNetVegetables230427_145051.emb.pkl',
-                                              [{"weight_decay": '1.0'}],
+                                              [1.0],
                                               use_gt=False,
                                               checkpoint=None)
 
 TEST_TRAIN_MULTIPLE_FEATURES = test_data_type.TestData(LinearClassifierWrapper.tag,
                                                        'test_data/TimmResnetWrapperImageNetVegetables230427_145051.emb.pkl',
                                                        'test_data/TimmResnetWrapperImageNetVegetables230427_145051.emb.pkl',
-                                                       [{"weight_decay": '1.0'}],
+                                                       [1.0],
                                                        use_gt=False,
                                                        checkpoint=None)
 
 TEST_TRAIN_WD_LARGE_GT = test_data_type.TestData(LinearClassifierWrapper.tag,
                                                  'test_data/TimmResnetWrapperImageNetVegetables230427_145051.emb.pkl',
                                                  None,
-                                                 [{"weight_decay": '1.0'}],
+                                                 [1.0],
                                                  use_gt=True,
                                                  checkpoint=None)
 
@@ -38,7 +36,7 @@ TEST_TRAIN_WD_LARGE_GT = test_data_type.TestData(LinearClassifierWrapper.tag,
 TEST_EVAL = test_data_type.TestData(LinearClassifierWrapper.tag,
                                     'test_data/ResNetDroneBird230424_191030.emb.pkl',
                                     None,
-                                    [{"weight_decay": '0.0'}],
+                                    [0.0],
                                     use_gt=True,
                                     checkpoint='test_data/epoch=39-step=160.ckpt')
 
@@ -53,6 +51,6 @@ def linear_classifier_test(test_func: Callable[[test_data_type.TestData], None])
     ]
 
     for test_data in testdata:
-        print("Testing {0}".format(test_data.kwargs))
+        print("Testing {0}".format(test_data.weight_decays))
         test_func(test_data)
         print("===========================================")

@@ -24,7 +24,7 @@ def test(test_data: test_data_type.TestData):
 
     clf = classifier_pipeline.ClassifierPipeline(test_data.classifier_tag)
     _ = clf.classify(test_data.embeddings_pkl, metadata_folder, test_data.use_gt,
-                     test_data.pkl_with_probabilities, test_data.kwargs)
+                     test_data.pkl_with_probabilities, test_data.weight_decays)
     predictions_df = clf.get_probabilities_df()
 
     predictions_columns = data_helpers.get_columns_which_start_with(predictions_df,
@@ -43,5 +43,5 @@ def test(test_data: test_data_type.TestData):
 
 
 if __name__ == "__main__":
-    # linear_clf_test_data.linear_classifier_test(test)
-    logistic_regression_test_cases.lr_classifier_test(test)
+    linear_clf_test_data.linear_classifier_test(test)
+    # logistic_regression_test_cases.lr_classifier_test(test)

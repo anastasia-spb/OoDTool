@@ -7,6 +7,6 @@ class TestData:
     classifier_tag: str
     embeddings_pkl: str
     pkl_with_probabilities: Optional[str]
-    kwargs: List[dict]
+    weight_decays: List[float]
     use_gt: bool
-    checkpoint: None
+    checkpoint: str

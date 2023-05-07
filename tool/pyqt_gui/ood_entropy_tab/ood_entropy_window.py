@@ -61,6 +61,7 @@ class EmbeddingsFilesFrame(QFrame):
         self.selected_probabilities = value
 
     def clear_layout(self):
+        self.checkboxes = []
         while self.layout.count():
             child = self.layout.takeAt(0)
             if child.widget():

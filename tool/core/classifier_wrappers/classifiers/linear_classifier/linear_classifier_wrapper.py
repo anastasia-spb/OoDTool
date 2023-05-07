@@ -11,7 +11,7 @@ from tool.core.classifier_wrappers.classifiers.i_classifier import IClassifier
 
 
 class LinearClassifier(pl.LightningModule):
-    def __init__(self, feature_dim, num_classes, weight_decay, lr=0.001, max_epochs=100):
+    def __init__(self, feature_dim, num_classes, weight_decay, lr=0.001, max_epochs=300):
         super(LinearClassifier, self).__init__()
         self.weight_decay = weight_decay
         self.lr = lr
@@ -64,7 +64,7 @@ class LinearClassifierWrapper(IClassifier):
         return "{0}".format(self.weight_decay)
 
     @classmethod
-    def _train(cls, model, batch_size, train_dataset, valid_dataset, device, output_dir: str, max_epochs=100):
+    def _train(cls, model, batch_size, train_dataset, valid_dataset, device, output_dir: str, max_epochs=300):
         trainer = pl.Trainer(default_root_dir=os.path.join(output_dir, "LinearClassifierTrain"),
                              accelerator="gpu" if str(device).startswith("cuda") else "cpu",
                              devices=1,
@@ -86,7 +86,7 @@ class LinearClassifierWrapper(IClassifier):
     def __train_run(self, model, X_train, y_train, device, output_dir):
         dataset = TensorDataset(torch.from_numpy(X_train).type(torch.float),
                                 torch.LongTensor(y_train))
-        train_set, val_set = random_split(dataset, [0.7, 0.3], generator=torch.Generator().manual_seed(42))
+        train_set, val_set = random_split(dataset, [0.9, 0.1], generator=torch.Generator().manual_seed(42))
 
         trainer = self._train(model=model, batch_size=self.batch_size, train_dataset=train_set,
                               valid_dataset=val_set, output_dir=output_dir, device=device)
