@@ -76,18 +76,18 @@ def objective(trial, output_dir: str, embeddings_files, embeddings_metric_file, 
     trial.set_user_attr("miss_with_high_ood_and_conf", trial_metrics["miss_with_high_ood_and_conf"][0])
     trial.set_user_attr("tags", tags)
 
-    return trial_metrics["k50"][0] # trial_metrics["metric"][0]
+    return trial_metrics["metric"][0]
 
 
 def start_optimization():
     # ALl parameters
+    wd = '/home/nastya/Desktop/ood_datasets/CatsDogs/oodsession_0'
     embeddings = [
-        '/home/nastya/Desktop/ood_datasets/DroneBird/oodsession_7/TimmResnetWrapper_densenet121_DroneBird_1024_230507_134347.030.emb.pkl',
-        '/home/nastya/Desktop/ood_datasets/DroneBird/oodsession_7/TimmResnetWrapper_resnet34_DroneBird_512_230507_134006.988.emb.pkl']
+        os.path.join(wd, 'TimmResnetWrapper_densenet121_CatsDogs_1024_230510_062632.155.emb.pkl'),
+        os.path.join(wd, 'TimmResnetWrapper_resnet50_CatsDogs_2048_230510_062322.486.emb.pkl')]
     embeddings_metric_file = \
-        '/home/nastya/Desktop/ood_datasets/DroneBird/oodsession_7/TimmResnetWrapper_densenet121_DroneBird_1024_230507_134347.030.emb.pkl'
-    ood_folders = ['drones/close_to_ood', 'birds/close_to_ood', 'bird_drone',
-                   'ood_samples']
+        os.path.join(wd, 'TimmResnetWrapper_densenet121_CatsDogs_1024_230510_062632.155.emb.pkl')
+    ood_folders = ['ood_samples']
 
     tags_combinations = []
 
