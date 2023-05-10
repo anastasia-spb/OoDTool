@@ -18,9 +18,10 @@ from tool.core.model_wrappers.models.alexnet.train_and_test.utils import train_m
 def train_timm(
         checkpoint_path='',
         finetune=False):
-    data_dir = '/home/nastya/Desktop/ood_datasets/CatsDogs'
-    metadata_file = '/home/nastya/Desktop/ood_datasets/CatsDogs/ood_session_train/CatsDogs.meta.pkl'
-    classes = ["Cat", "Dog"]
+    data_dir = '/home/vlasova/datasets/ood_datasets/PedestrianTrafficLights'
+    metadata_file = \
+        '/home/vlasova/datasets/ood_datasets/PedestrianTrafficLights/train_weights/PedestrianTrafficLights.meta.pkl'
+    classes = ["Forward", "Blinked", "Stop"]
 
     # Cuda maintenance
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"

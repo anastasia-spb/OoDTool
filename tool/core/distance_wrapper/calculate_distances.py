@@ -114,6 +114,6 @@ def test_euclidean(input_data):
 
 if __name__ == "__main__":
     # test_data = '../../../example_data/tool_working_dir/BalloonsBubbles/TimmResnetWrapper_BalloonsBubbles_1024_230430_001343.emb.pkl'
-    test_data = '/home/vlasova/datasets/TrafficLightsDVC/oodsession_0/RegnetWrapper_CarLightsDVC_784_230502_115123.emb.pkl'
-    # test_cosine(test_data)
-    test_euclidean(test_data)
+    test_data = '/home/vlasova/datasets/all/TrafficLightsDVC/oodsession_3/RegnetWrapper_CarLightsDVC_784_230510_092138.871.emb.pkl'
+    test_cosine(test_data)
+    # test_euclidean(test_data)

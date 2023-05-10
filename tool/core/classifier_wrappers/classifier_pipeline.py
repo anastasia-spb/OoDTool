@@ -66,8 +66,8 @@ class ClassifierPipeline:
 
         # Store configuration
         if store_config_file:
-            config_file = store_pipeline_config(embeddings_file, probabilities_file, self.classifier.selected_model, checkpoints,
-                                                output_folder)
+            config_file = store_pipeline_config(embeddings_file, probabilities_file, self.classifier.selected_model,
+                                                checkpoints, output_folder)
         else:
             config_file = None
 

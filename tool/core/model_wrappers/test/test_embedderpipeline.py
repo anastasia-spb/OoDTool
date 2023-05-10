@@ -9,6 +9,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 
 from tool.core.model_wrappers.models.alexnet.alexnet_wrapper import AlexNetWrapper
 from tool.core.model_wrappers.models.timm_resnet.timm_resnet_wrapper import TimmResnetWrapper
+from tool.core.model_wrappers.models.regnet.regnet_wrapper import RegnetWrapper
 from tool.core.model_wrappers.embedder_pipeline import EmbedderPipeline
 from tool.core import data_types
 
@@ -96,6 +97,12 @@ TIMM_PRETRAINED_TEST_PARAMS = TestData('/home/vlasova/Desktop/NIR/NIR/OoDTool/ex
                                         'checkpoint_path': ''},
                                        0.46)
 
+REGNET_PRETRAINED_TEST_PARAMS = TestData('/home/vlasova/datasets/all/TrafficLightsDVC',
+                                       '/home/vlasova/datasets/all/TrafficLightsDVC/oodsession_3/CarLightsDVC.meta.pkl',
+                                       RegnetWrapper.tag,
+                                       {'model_checkpoint': '/home/vlasova/Desktop/gitlab/oodtool/pretrained_weights/shared-regnet_trafficlights_v8/model.best.pth'},
+                                       0.46)
+
 
 def test_pipeline(store_embeddings: bool, requires_grad: bool):
     testdata = [
@@ -103,7 +110,8 @@ def test_pipeline(store_embeddings: bool, requires_grad: bool):
         # TIMM_DENSNET_TEST_PARAMS,
         # TIMM_RESNET_TEST_PARAMS,
         # TIMM_RESNET_ON_UNKNOWN_CLASSES_TEST_PARAMS,
-        TIMM_PRETRAINED_TEST_PARAMS,
+        # TIMM_PRETRAINED_TEST_PARAMS,
+        REGNET_PRETRAINED_TEST_PARAMS
     ]
 
     for test_data in testdata:

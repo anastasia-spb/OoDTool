@@ -1,5 +1,6 @@
 import os
 import pickle
+import warnings
 from typing import List
 from datetime import datetime
 
@@ -24,7 +25,10 @@ class OoDScore:
         def calculate_entropy(features_row):
             mat = np.stack(features_row)
             mean_dist = np.mean(mat, axis=0)
-            return entropy(mean_dist)
+            entropy_score = entropy(mean_dist)
+            if entropy_score is np.NaN:
+                warnings.warn("Entropy score is none for mean dist {0}".format(mean_dist))
+            return entropy_score
 
         probabilities_mat = probabilities_df[probabilities_columns].values
         score = np.apply_along_axis(calculate_entropy, axis=1, arr=probabilities_mat)

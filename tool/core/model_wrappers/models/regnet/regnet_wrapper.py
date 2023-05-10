@@ -1,7 +1,9 @@
+import os
 import torch
 from torchvision import transforms
 
 from tool.core.utils.mock_missing import mock_missing
+from torch.nn import functional as F
 from tool.core.model_wrappers.models.i_model import IModel, ModelOutput
 try:
     from catalights.models.multihead_regnet import regnet_mh_y_800mf
@@ -16,7 +18,7 @@ except ImportError:
 
 class RegnetWrapperParameters:
     def __init__(self):
-        self.batchsize = 16
+        self.batchsize = 4
         self.model_checkpoint =\
             './pretrained_weights/embedders/shared-regnet_trafficlights_v8/model.best.pth'
 
@@ -29,6 +31,7 @@ class RegnetWrapper(IModel):
         super().__init__()
         self.parameters.model_checkpoint = kwargs["model_checkpoint"]
         self.device = device
+        os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
         self.model = self.__load_model(device)
 
     @classmethod
@@ -75,6 +78,7 @@ class RegnetWrapper(IModel):
 
     def predict(self, img, requires_grad) -> dict:
         embeddings = []
+        img.requires_grad = requires_grad
 
         def copy_embeddings(m, o):
             embeddings.append(o[0])
@@ -83,7 +87,15 @@ class RegnetWrapper(IModel):
         _ = layer.register_forward_pre_hook(copy_embeddings)
         prediction = self.model(img.to(self.device))
 
+        grads = None
+        if requires_grad:
+            classification = torch.argmax(prediction[0], dim=1)
+            one_hot_encoding = F.one_hot(classification, num_classes=24).to(self.device)
+            prediction[0].backward(gradient=one_hot_encoding)
+            grads = img.grad.detach().cpu()
+
         # Only first head is evaluated
         return ModelOutput(embeddings=embeddings[0].detach().cpu(),
-                           probabilities=prediction[0].detach().cpu()).to_dict()
+                           probabilities=prediction[0].detach().cpu(),
+                           grads=grads).to_dict()
 

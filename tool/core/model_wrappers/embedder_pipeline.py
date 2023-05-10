@@ -20,7 +20,8 @@ from tool.core.model_wrappers.models.regnet.regnet_wrapper import RegnetWrapper
 from tool.core.model_wrappers.overlay_heatmap import overlay_heatmap
 
 MODEL_WRAPPERS = {AlexNetWrapper.tag: AlexNetWrapper,
-                  TimmResnetWrapper.tag: TimmResnetWrapper}
+                  TimmResnetWrapper.tag: TimmResnetWrapper,
+                  RegnetWrapper.tag: RegnetWrapper}
 
 
 class EmbedderPipeline:
@@ -86,6 +87,8 @@ class EmbedderPipeline:
                     self.__store_grads(result["grads"], paths, grads_folder, self.data_dir)
                     result["grads"] = None
                 model_output.append(result)
+                gc.collect()
+                torch.cuda.empty_cache()
 
         self.__postprocessing(model_output)
         self.__save_model_output(self.dataset_name, self.metadata_folder)

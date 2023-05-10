@@ -5,12 +5,9 @@ import joblib
 from typing import Optional
 
 from sklearn.linear_model import LogisticRegression
-from sklearn.linear_model import SGDClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline
 
-SUPPORTED_CLASSIFIERS = ["LogisticRegression_liblinear", "LogisticRegression_newton-cg",
-                         "LogisticRegression_lbfgs", "SGDClassifier"]
+SUPPORTED_CLASSIFIERS = ["LogisticRegression_liblinear", "LogisticRegression_saga",
+                         "LogisticRegression_lbfgs"]
 
 
 class LogisticRegressionWrapper:
@@ -39,16 +36,13 @@ class LogisticRegressionWrapper:
         if checkpoint is not None:
             clf = joblib.load(checkpoint)
         else:
-            if self.selected_model == "LogisticRegression_liblinear":
-                clf = LogisticRegression(random_state=42, C=weight_decay, solver="liblinear")
-            elif self.selected_model == "LogisticRegression_newton-cg":
-                clf = LogisticRegression(random_state=42, C=weight_decay, solver="newton-cg")
+            if self.selected_model == "LogisticRegression_saga":
+                clf = LogisticRegression(random_state=42, C=weight_decay, solver="saga", multi_class='multinomial')
             elif self.selected_model == "LogisticRegression_lbfgs":
-                clf = LogisticRegression(random_state=42, C=weight_decay, solver="lbfgs")
+                clf = LogisticRegression(random_state=42, C=weight_decay, solver="lbfgs", multi_class='multinomial')
             else:
-                clf = make_pipeline(StandardScaler(), SGDClassifier(max_iter=1000, tol=1e-3, alpha=weight_decay,
-                                                                    loss='log_loss'))
-                self.selected_model = "SGDClassifier"
+                clf = LogisticRegression(random_state=42, C=weight_decay, solver="liblinear")
+                self.selected_model = "LogisticRegression_liblinear"
 
             clf.fit(X_train, y_train)
 

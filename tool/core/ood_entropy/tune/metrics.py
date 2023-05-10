@@ -19,8 +19,6 @@ def ood_metrics(embeddings_metric_file, ood_file_path, ood_folders):
                                                                           row[data_types.LabelsType.name()]),
                                           axis=1).values
 
-    data_df["miss"] = data_df.apply(lambda row: row[data_types.LabelType.name()] != row["pred_label"], axis=1).values
-
     data_df["conf"] = data_df.apply(lambda row: max(row[data_types.ClassProbabilitiesType.name()]), axis=1).values
 
     def in_ood(img_path: str) -> bool:
@@ -31,6 +29,9 @@ def ood_metrics(embeddings_metric_file, ood_file_path, ood_folders):
         return False
 
     data_df["ood_flag"] = data_df.apply(lambda row: in_ood(row[data_types.RelativePathType.name()]), axis=1).values
+    # There is no correct classification for OoD samples
+    data_df["miss"] = data_df.apply(lambda row: (row[data_types.LabelType.name()] != row["pred_label"] and
+                                                 (not row["ood_flag"])), axis=1).values
 
     n_samples = data_df.shape[0]
     data_df.sort_values(by=[data_types.OoDScoreType.name()], inplace=True, ascending=False)
