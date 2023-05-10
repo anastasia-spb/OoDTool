@@ -37,11 +37,14 @@ class LogisticRegressionWrapper:
             clf = joblib.load(checkpoint)
         else:
             if self.selected_model == "LogisticRegression_saga":
-                clf = LogisticRegression(random_state=42, C=weight_decay, solver="saga", multi_class='multinomial')
+                clf = LogisticRegression(random_state=42, C=weight_decay, solver="saga", multi_class='multinomial',
+                                         max_iter=300)
             elif self.selected_model == "LogisticRegression_lbfgs":
-                clf = LogisticRegression(random_state=42, C=weight_decay, solver="lbfgs", multi_class='multinomial')
+                clf = LogisticRegression(random_state=42, C=weight_decay, solver="lbfgs", multi_class='multinomial',
+                                         max_iter=300)
             else:
-                clf = LogisticRegression(random_state=42, C=weight_decay, solver="liblinear")
+                clf = LogisticRegression(random_state=42, C=weight_decay, solver="liblinear",
+                                         max_iter=100)
                 self.selected_model = "LogisticRegression_liblinear"
 
             clf.fit(X_train, y_train)

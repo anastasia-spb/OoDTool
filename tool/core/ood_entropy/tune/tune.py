@@ -42,19 +42,19 @@ def objective(trial, output_dir: str, embeddings_files, embeddings_metric_file, 
     tags_idx = trial.suggest_int("tags", 0, len(tags_combinations) - 1)
     tags = tags_combinations[tags_idx]
 
+    emb_weight_decays = []
+    for i in range(n_classifiers):
+        param_name = "".join(("c_exp_", str(i)))
+        exp = trial.suggest_int(param_name, -9, 9)
+        c = 10 ** exp
+        if c in emb_weight_decays:
+            # No sense to test classifiers with same weight decay
+            raise optuna.exceptions.TrialPruned()
+        emb_weight_decays.append(c)
+
     weight_decays = []
     for k in range(len(tags)):
-        emb_weight_decays = []
-        for i in range(n_classifiers):
-            param_name = "".join(("c_exp_", str(k), "_", str(i)))
-            exp = trial.suggest_int(param_name, -9, 9)
-            c = 10 ** exp
-            if c in emb_weight_decays:
-                # No sense to test classifiers with same weight decay
-                raise optuna.exceptions.TrialPruned()
-            emb_weight_decays.append(c)
-        emb_weight_decays = set(emb_weight_decays)
-        weight_decays.append(list(emb_weight_decays))
+        weight_decays.append(emb_weight_decays)
 
     trial_dir = os.path.join(output_dir, "".join(("trial_", str(trial.number))))
     if not os.path.exists(trial_dir):
@@ -71,22 +71,22 @@ def objective(trial, output_dir: str, embeddings_files, embeddings_metric_file, 
     trial.set_user_attr("miss_with_high_ood_and_conf", trial_metrics["miss_with_high_ood_and_conf"][0])
     trial.set_user_attr("tags", tags)
 
-    return trial_metrics["miss_with_high_ood_and_conf"][0]
+    return trial_metrics["metric"][0]
 
 
 def start_optimization():
     # ALl parameters
-    wd = '/home/vlasova/datasets/all/TrafficLightsDVC/oodsession_3'
+    wd = '/home/vlasova/datasets/ood_datasets/PedestrianTrafficLights/oodsession_0'
     embeddings = [
-        os.path.join(wd, 'TimmResnetWrapper_resnet50_CarLightsDVC_2048_230510_081343.026.emb.pkl'),
-        os.path.join(wd, 'RegnetWrapper_CarLightsDVC_784_230510_092138.871.emb.pkl')]
+        os.path.join(wd, 'TimmResnetWrapper_densenet121_PedestrianTrafficLights_1024_230510_154849.143.emb.pkl'),
+        os.path.join(wd, 'TimmResnetWrapper_resnet50_PedestrianTrafficLights_2048_230510_153037.455.emb.pkl')]
     embeddings_metric_file = \
-        os.path.join(wd, 'RegnetWrapper_CarLightsDVC_784_230510_092138.871.emb.pkl')
+        os.path.join(wd, 'TimmResnetWrapper_densenet121_PedestrianTrafficLights_1024_230510_154849.143.emb.pkl')
     ood_folders = ['ood_samples']
     # We shouldn't optimize number of classifiers in ensemble at the same time with hyperparameters,
     # since it's not documented how optuna will treat other parameters which are suggested,
     # but not used: https://github.com/optuna/optuna/issues/1459
-    n_classifiers = 3
+    n_classifiers = 5
 
     tags_combinations = []
 
@@ -149,5 +149,5 @@ def run_trial_manually():
 
 
 if __name__ == "__main__":
-    # start_optimization()
-    run_trial_manually()
+    start_optimization()
+    # run_trial_manually()
