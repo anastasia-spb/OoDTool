@@ -8,22 +8,28 @@ from typing import List, Optional
 from tool.core import data_types
 from tool.core.utils import data_helpers
 from tool.core.classifier_wrappers.classifiers.lr_wrapper import LogisticRegressionWrapper
+from tool.core.classifier_wrappers.classifiers.torch_lr import LinearClassifierWrapper
 from tool.core.classifier_wrappers.classifier_pipeline_config import store_pipeline_config, ClfConfig, \
     unite_configurations
+
+SUPPORTED_CLASSIFIERS = {"LogisticRegression_liblinear": LogisticRegressionWrapper,
+                         "LogisticRegression_saga": LogisticRegressionWrapper,
+                         "LogisticRegression_lbfgs": LogisticRegressionWrapper,
+                         LinearClassifierWrapper.tag: LinearClassifierWrapper}
 
 
 class ClassifierPipeline:
     def __init__(self, classifier_tag: str):
         self.probabilities_df = pd.DataFrame()
-        self.classifier = LogisticRegressionWrapper(classifier_tag)
-
-    @classmethod
-    def input_hint(cls):
-        return LogisticRegressionWrapper.input_hint()
+        self.classifier = SUPPORTED_CLASSIFIERS[classifier_tag](classifier_tag)
 
     @classmethod
     def parameters_hint(cls):
-        return LogisticRegressionWrapper.parameters_hint()
+        return 'C: Inverse of regularization strength; must be a positive float.'
+
+    @classmethod
+    def input_hint(cls):
+        return "0.0"
 
     @staticmethod
     def prepare_data(embedding_file, use_gt_for_training, probabilities_file, inference_mode):
@@ -77,7 +83,8 @@ class ClassifierPipeline:
         return self.probabilities_df
 
     def classify(self, embeddings_file: str, output_dir: str, use_gt_for_training: bool,
-                 probabilities_file: Optional[str], weight_decay: List[float], checkpoint: Optional[str] = None) -> (str, str):
+                 probabilities_file: Optional[str], weight_decay: List[float], checkpoint: Optional[str] = None) -> (
+    str, str):
         """Walks through dataset directory and stores metadata information about images into <dataset_name>.meta.pkl file.
             Args:
                 embeddings_file: List of all files with embeddings
@@ -136,7 +143,7 @@ class ClassifierPipeline:
 
     def classify_from_config(self, embeddings_file: str, clf_config: dict, output_dir: str) -> str:
         config = ClfConfig(clf_config)
-        self.classifier = LogisticRegressionWrapper(config.get_tag())
+        self.classifier = SUPPORTED_CLASSIFIERS[config.get_tag()](config.get_tag())
         weights = config.get_weights()
 
         if not os.path.isfile(embeddings_file):

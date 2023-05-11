@@ -7,7 +7,7 @@ from tool.core.ood_entropy.ood_score import OoDScore
 import optuna
 from optuna.trial import TrialState
 from tool.core.classifier_wrappers.classifier_pipeline import ClassifierPipeline
-from tool.core.classifier_wrappers.classifiers.lr_wrapper import SUPPORTED_CLASSIFIERS
+from tool.core.classifier_wrappers.classifier_pipeline import SUPPORTED_CLASSIFIERS
 from tool.core.ood_entropy.tune.metrics import ood_metrics
 
 
@@ -90,7 +90,7 @@ def start_optimization():
 
     tags_combinations = []
 
-    for item in SUPPORTED_CLASSIFIERS:
+    for item in SUPPORTED_CLASSIFIERS.keys():
         # For simplicity use same classifier type for each embedding
         tags_combinations.append([item, item])
 
@@ -103,7 +103,7 @@ def start_optimization():
                                    tags_combinations=tags_combinations, n_classifiers=n_classifiers)
 
     study = optuna.create_study(direction="maximize")
-    study.optimize(func, n_trials=100, timeout=None)
+    study.optimize(func, n_trials=1000, timeout=None)
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
     complete_trials = study.get_trials(deepcopy=False, states=[TrialState.COMPLETE])
@@ -137,11 +137,11 @@ def run_trial_manually():
         os.path.join(wd, 'RegnetWrapper_CarLightsDVC_784_230510_092138.871.emb.pkl')
     ood_folders = ['']
 
-    output_dir = './tmp'
+    output_dir = './tmp2'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    run_with_trial(tags=["LogisticRegression_lbfgs", "LogisticRegression_lbfgs"],
+    run_with_trial(tags=["LogisticRegression_saga", "LogisticRegression_saga"],
                    embeddings_files=embeddings, output_dir=output_dir,
                    weight_decays=[[10e-5, 1.0, 10e5], [10e-5, 1.0, 10e5]],
                    embeddings_metric_file=embeddings_metric_file,
@@ -149,5 +149,5 @@ def run_trial_manually():
 
 
 if __name__ == "__main__":
-    start_optimization()
-    # run_trial_manually()
+    # start_optimization()
+    run_trial_manually()

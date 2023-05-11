@@ -5,31 +5,22 @@ import joblib
 from typing import Optional
 
 from sklearn.linear_model import LogisticRegression
-
-SUPPORTED_CLASSIFIERS = ["LogisticRegression_liblinear", "LogisticRegression_saga",
-                         "LogisticRegression_lbfgs"]
+from tool.core.classifier_wrappers.classifiers.i_classifier import IClassifier
 
 
-class LogisticRegressionWrapper:
+class LogisticRegressionWrapper(IClassifier):
     def __init__(self, selected_model: str):
         super().__init__()
         self.selected_model = selected_model
         self.c = 1.0
         self.checkpoint = None
 
-    @classmethod
-    def parameters_hint(cls):
-        return 'C: Inverse of regularization strength; must be a positive float.'
-
-    @classmethod
-    def input_hint(cls):
-        return "0.0"
-
     def get_checkpoint(self):
         return self.checkpoint
 
     def run(self, X_train: Optional[np.ndarray], y_train: Optional[np.ndarray], X_test: np.ndarray,
-            weight_decay: float, output_dir: str, checkpoint: Optional[str] = None) -> np.ndarray:
+            weight_decay: float, output_dir: str, checkpoint: Optional[str] = None,
+            num_classes: int = None) -> np.ndarray:
 
         assert weight_decay >= 0.0
 
@@ -38,10 +29,10 @@ class LogisticRegressionWrapper:
         else:
             if self.selected_model == "LogisticRegression_saga":
                 clf = LogisticRegression(random_state=42, C=weight_decay, solver="saga", multi_class='multinomial',
-                                         max_iter=300)
+                                         max_iter=1000)
             elif self.selected_model == "LogisticRegression_lbfgs":
                 clf = LogisticRegression(random_state=42, C=weight_decay, solver="lbfgs", multi_class='multinomial',
-                                         max_iter=300)
+                                         max_iter=1000)
             else:
                 clf = LogisticRegression(random_state=42, C=weight_decay, solver="liblinear",
                                          max_iter=100)

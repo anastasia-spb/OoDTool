@@ -40,11 +40,17 @@ def ood_metrics(embeddings_metric_file, ood_file_path, ood_folders):
     k100 = data_df["ood_flag"][:100].values.sum()
 
     total_miss = data_df["miss"][:n_samples].values.sum()
-    miss_with_high_ood = (data_df[data_df["miss"]]["ood_score"].values > 0.75).sum()
-    miss_with_high_ood_and_conf = \
-        data_df.loc[(data_df['miss']) & (data_df['ood_score'] > 0.75) & (data_df['conf'] > 0.75)].shape[0]
+    if total_miss > 0.0:
+        miss_with_high_ood = (data_df[data_df["miss"]]["ood_score"].values > 0.75).sum()
+        miss_with_high_ood_and_conf = \
+            data_df.loc[(data_df['miss']) & (data_df['ood_score'] > 0.75) & (data_df['conf'] > 0.75)].shape[0]
 
-    metric = (1.0 * miss_with_high_ood_and_conf / total_miss) + (k50 / 50.0)
+        metric = (1.0 * miss_with_high_ood_and_conf / total_miss) + (k50 / 50.0)
+
+    else:
+        miss_with_high_ood = 0.0
+        miss_with_high_ood_and_conf = 0.0
+        metric = k50 / 50.0
 
     metrics = {"n_samples": [n_samples], "total_ood": [total_ood], "k50": [k50], "k100": [k100],
                "total_miss": [total_miss], "miss_with_high_ood": [miss_with_high_ood],
