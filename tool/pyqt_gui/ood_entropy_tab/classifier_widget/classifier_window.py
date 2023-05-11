@@ -32,7 +32,7 @@ class ClassifierFrame(QFrame):
         self.settings = PathsSettings()
         self.ood_output = '...'
 
-        self.selected_classifier_tag = SUPPORTED_CLASSIFIERS.keys()[0]
+        self.selected_classifier_tag = list(SUPPORTED_CLASSIFIERS.keys())[0]
         self.classifier = ClassifierThread(self.selected_classifier_tag,
                                            embeddings_files=[],
                                            output_dir='',

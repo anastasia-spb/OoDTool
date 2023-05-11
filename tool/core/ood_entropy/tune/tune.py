@@ -1,33 +1,26 @@
 import pandas as pd
 import os
 from typing import List
-import itertools
 from tool.core.ood_entropy.ood_score import OoDScore
 
 import optuna
 from optuna.trial import TrialState
 from tool.core.classifier_wrappers.classifier_pipeline import ClassifierPipeline
-from tool.core.classifier_wrappers.classifier_pipeline import SUPPORTED_CLASSIFIERS
 from tool.core.ood_entropy.tune.metrics import ood_metrics
 
 
-def run_with_trial(tags: List[str], embeddings_files: List[str], output_dir: str,
-                   weight_decays: List[List[float]], embeddings_metric_file: str,
+def run_with_trial(tag: str, embeddings_files: List[str], output_dir: str,
+                   weight_decays: List[float], embeddings_metric_file: str,
                    ood_folders: List[str]):
-    assert len(tags) == len(embeddings_files)
-    assert len(embeddings_files) == len(weight_decays)
 
-    probabilities = []
-    for emb, tag, wds in zip(embeddings_files, tags, weight_decays):
-        classifier_pipeline = ClassifierPipeline(tag)
-        output = classifier_pipeline.train_and_classify([emb], output_dir, use_gt_for_training=True,
-                                                        probabilities_file=None, weight_decays=wds)
-        probabilities.append(output[0])
+    classifier_pipeline = ClassifierPipeline(tag)
+    probabilities = classifier_pipeline.train_and_classify(embeddings_files, output_dir, use_gt_for_training=True,
+                                                           probabilities_file=None, weight_decays=weight_decays)
 
     pipeline = OoDScore()
     ood_score_file = pipeline.run(probabilities, output_dir)
     trial_metrics = ood_metrics(embeddings_metric_file, ood_score_file, ood_folders)
-    trial_metrics["tags"] = [tags]
+    trial_metrics["tags"] = tag
 
     trial_metrics_file = os.path.join(output_dir, "metrics.csv")
     trial_metrics_df = pd.DataFrame.from_dict(trial_metrics)
@@ -36,12 +29,7 @@ def run_with_trial(tags: List[str], embeddings_files: List[str], output_dir: str
     return trial_metrics
 
 
-def objective(trial, output_dir: str, embeddings_files, embeddings_metric_file, ood_folders, tags_combinations,
-              n_classifiers):
-    # Generate the optimizers.
-    tags_idx = trial.suggest_int("tags", 0, len(tags_combinations) - 1)
-    tags = tags_combinations[tags_idx]
-
+def objective(trial, tag: str, output_dir: str, embeddings_files, embeddings_metric_file, ood_folders, n_classifiers):
     emb_weight_decays = []
     for i in range(n_classifiers):
         param_name = "".join(("c_exp_", str(i)))
@@ -52,15 +40,11 @@ def objective(trial, output_dir: str, embeddings_files, embeddings_metric_file, 
             raise optuna.exceptions.TrialPruned()
         emb_weight_decays.append(c)
 
-    weight_decays = []
-    for k in range(len(tags)):
-        weight_decays.append(emb_weight_decays)
-
     trial_dir = os.path.join(output_dir, "".join(("trial_", str(trial.number))))
     if not os.path.exists(trial_dir):
         os.makedirs(trial_dir)
 
-    trial_metrics = run_with_trial(tags, embeddings_files, trial_dir, weight_decays,
+    trial_metrics = run_with_trial(tag, embeddings_files, trial_dir, emb_weight_decays,
                                    embeddings_metric_file, ood_folders)
 
     trial.set_user_attr("metric", trial_metrics["metric"][0])
@@ -69,7 +53,7 @@ def objective(trial, output_dir: str, embeddings_files, embeddings_metric_file, 
     trial.set_user_attr("total_miss", trial_metrics["total_miss"][0])
     trial.set_user_attr("miss_with_high_ood", trial_metrics["miss_with_high_ood"][0])
     trial.set_user_attr("miss_with_high_ood_and_conf", trial_metrics["miss_with_high_ood_and_conf"][0])
-    trial.set_user_attr("tags", tags)
+    trial.set_user_attr("tag", tag)
 
     return trial_metrics["metric"][0]
 
@@ -88,22 +72,18 @@ def start_optimization():
     # but not used: https://github.com/optuna/optuna/issues/1459
     n_classifiers = 5
 
-    tags_combinations = []
-
-    for item in SUPPORTED_CLASSIFIERS.keys():
-        # For simplicity use same classifier type for each embedding
-        tags_combinations.append([item, item])
+    tag = 'LogisticRegression_saga'
 
     output_dir = './tmp'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    func = lambda trial: objective(trial, output_dir=output_dir, embeddings_files=embeddings,
+    func = lambda trial: objective(trial, tag=tag, output_dir=output_dir, embeddings_files=embeddings,
                                    embeddings_metric_file=embeddings_metric_file, ood_folders=ood_folders,
-                                   tags_combinations=tags_combinations, n_classifiers=n_classifiers)
+                                   n_classifiers=n_classifiers)
 
     study = optuna.create_study(direction="maximize")
-    study.optimize(func, n_trials=1000, timeout=None)
+    study.optimize(func, n_trials=100, timeout=10000)
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
     complete_trials = study.get_trials(deepcopy=False, states=[TrialState.COMPLETE])
@@ -141,13 +121,13 @@ def run_trial_manually():
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    run_with_trial(tags=["LogisticRegression_saga", "LogisticRegression_saga"],
+    run_with_trial(tag='LogisticRegression_saga',
                    embeddings_files=embeddings, output_dir=output_dir,
-                   weight_decays=[[10e-5, 1.0, 10e5], [10e-5, 1.0, 10e5]],
+                   weight_decays=[10e-5, 1.0, 10e5],
                    embeddings_metric_file=embeddings_metric_file,
                    ood_folders=ood_folders)
 
 
 if __name__ == "__main__":
-    # start_optimization()
-    run_trial_manually()
+    start_optimization()
+    # run_trial_manually()

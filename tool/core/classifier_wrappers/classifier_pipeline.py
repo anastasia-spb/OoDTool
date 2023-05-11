@@ -3,6 +3,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 from typing import List, Optional
 
 from tool.core import data_types
@@ -32,12 +33,16 @@ class ClassifierPipeline:
         return "0.0"
 
     @staticmethod
-    def prepare_data(embedding_file, use_gt_for_training, probabilities_file, inference_mode):
+    def prepare_data(embedding_file, use_gt_for_training, probabilities_file, inference_mode, scale=False):
         data_df = pd.read_pickle(embedding_file)
         num_classes = data_helpers.get_number_of_classes(data_df)
 
         embeddings = data_df[data_types.EmbeddingsType.name()].tolist()
         embeddings = np.array(embeddings, dtype=np.dtype('float64'))
+
+        if scale:
+            scaler = MinMaxScaler()
+            embeddings = scaler.fit_transform(embeddings)
 
         if inference_mode:
             return None, None, embeddings, num_classes, data_df[data_types.RelativePathType.name()]
@@ -83,8 +88,8 @@ class ClassifierPipeline:
         return self.probabilities_df
 
     def classify(self, embeddings_file: str, output_dir: str, use_gt_for_training: bool,
-                 probabilities_file: Optional[str], weight_decay: List[float], checkpoint: Optional[str] = None) -> (
-    str, str):
+                 probabilities_file: Optional[str], weight_decay: List[float],
+                 checkpoint: Optional[str] = None) -> (str, str):
         """Walks through dataset directory and stores metadata information about images into <dataset_name>.meta.pkl file.
             Args:
                 embeddings_file: List of all files with embeddings
@@ -109,7 +114,8 @@ class ClassifierPipeline:
         X_train, y_train, X, num_classes, relative_paths = self.prepare_data(embedding_file=embeddings_file,
                                                                              use_gt_for_training=use_gt_for_training,
                                                                              probabilities_file=probabilities_file,
-                                                                             inference_mode=inference_mode)
+                                                                             inference_mode=inference_mode,
+                                                                             scale=True)
         self.probabilities_df[data_types.RelativePathType.name()] = relative_paths
         checkpoints = []
         for i, wd in enumerate(weight_decay):
@@ -152,7 +158,8 @@ class ClassifierPipeline:
         _, _, X, num_classes, relative_paths = self.prepare_data(embedding_file=embeddings_file,
                                                                  use_gt_for_training=False,
                                                                  probabilities_file=None,
-                                                                 inference_mode=True)
+                                                                 inference_mode=True,
+                                                                 scale=True)
 
         self.probabilities_df[data_types.RelativePathType.name()] = relative_paths
         checkpoints = []

@@ -24,18 +24,22 @@ class LogisticRegressionWrapper(IClassifier):
 
         assert weight_decay >= 0.0
 
+        dual = True
+        if X_train.shape[0] > X_train.shape[1]:
+            dual = False
+
         if checkpoint is not None:
             clf = joblib.load(checkpoint)
         else:
             if self.selected_model == "LogisticRegression_saga":
                 clf = LogisticRegression(random_state=42, C=weight_decay, solver="saga", multi_class='multinomial',
-                                         max_iter=1000)
+                                         max_iter=300, dual=dual)
             elif self.selected_model == "LogisticRegression_lbfgs":
                 clf = LogisticRegression(random_state=42, C=weight_decay, solver="lbfgs", multi_class='multinomial',
-                                         max_iter=1000)
+                                         max_iter=300, dual=dual)
             else:
                 clf = LogisticRegression(random_state=42, C=weight_decay, solver="liblinear",
-                                         max_iter=100)
+                                         max_iter=300, dual=dual)
                 self.selected_model = "LogisticRegression_liblinear"
 
             clf.fit(X_train, y_train)
