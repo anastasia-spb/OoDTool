@@ -21,8 +21,8 @@ class LinearClassifier(pl.LightningModule):
                                     weight_decay=self.hparams.weight_decay)
 
         lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-                                                            milestones=[int(self.max_epochs * 0.6),
-                                                                        int(self.max_epochs * 0.8)],
+                                                            milestones=[int(self.hparams.max_epochs * 0.6),
+                                                                        int(self.hparams.max_epochs * 0.8)],
                                                             gamma=0.1)
         return [optimizer], [lr_scheduler]
 
@@ -54,9 +54,10 @@ class LinearClassifierWrapper(IClassifier):
         self.weight_decay = 0.1
         self.batch_size = 32
         self.checkpoint = None
+        self.selected_model = selected_model
 
     @classmethod
-    def _train(cls, model, batch_size, train_dataset, valid_dataset, device, output_dir: str, max_epochs=300):
+    def _train(cls, model, batch_size, train_dataset, valid_dataset, device, output_dir: str, max_epochs=100):
         trainer = pl.Trainer(default_root_dir=os.path.join(output_dir, "Torch_LR_Train"),
                              accelerator="gpu" if str(device).startswith("cuda") else "cpu",
                              devices="auto",

@@ -33,13 +33,13 @@ class LogisticRegressionWrapper(IClassifier):
         else:
             if self.selected_model == "LogisticRegression_saga":
                 clf = LogisticRegression(random_state=42, C=weight_decay, solver="saga", multi_class='multinomial',
-                                         max_iter=300, dual=dual)
+                                         max_iter=1000)
             elif self.selected_model == "LogisticRegression_lbfgs":
                 clf = LogisticRegression(random_state=42, C=weight_decay, solver="lbfgs", multi_class='multinomial',
-                                         max_iter=300, dual=dual)
+                                         max_iter=1000)
             else:
                 clf = LogisticRegression(random_state=42, C=weight_decay, solver="liblinear",
-                                         max_iter=300, dual=dual)
+                                         max_iter=1000, dual=dual)
                 self.selected_model = "LogisticRegression_liblinear"
 
             clf.fit(X_train, y_train)
