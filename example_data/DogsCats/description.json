@@ -23,6 +23,11 @@
           "path": "dogs_test",
           "test": true,
           "label": "Dog"
+        },
+        {
+          "path": "ood_samples",
+          "test": true,
+          "label": ""
         }
       ],
       "metadata":

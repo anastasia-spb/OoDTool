@@ -22,6 +22,7 @@ from PyQt5.QtGui import QColor
 from tool.pyqt_gui.analyze_settings import AdditionalSettings
 from tool.pyqt_gui.paths_settings import PathsSettings
 from tool.core.data_types import types
+from tool.core.utils import data_helpers
 from tool.pyqt_gui.qt_utils import find_pkl
 from tool.pyqt_gui.qt_utils.images_grid import ImagesGrid
 from tool.pyqt_gui.qt_utils.qt_types import ImageInfo
@@ -35,7 +36,11 @@ def get_images_to_show(ood_file_path: str, ascending: bool, labels: List[str], a
 
     def create_gt_conf(label):
         conf = [0.0] * len(labels)
-        conf[labels.index(label)] = 1.0
+        idx = data_helpers.label_to_idx(labels, label)
+        if idx != -1:
+            conf[idx] = 1.0
+        else:
+            conf.append(1.0)
         return conf
 
     if embeddings_df is not None:

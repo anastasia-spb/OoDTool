@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 
 from tool.core.data_types import types
+from tool.core.utils import data_helpers
 
 
 class DataReader:
@@ -42,18 +43,22 @@ class DataReader:
 
         embeddings = self.data_df[types.ProjectedEmbeddingsType.name()].tolist()
         self.embeddings = np.array(embeddings, dtype=np.dtype('float64'))
-        self.y = self.data_df.apply(lambda row: self.labels.index(row[types.LabelType.name()]), axis=1).values
+        # self.y = self.data_df.apply(lambda row: data_helpers.label_to_idx(self.labels, row[types.LabelType.name()]),
+        #                            axis=1).values
 
         if not use_gt_labels:
             probabilities = self.data_df[types.ClassProbabilitiesType.name()].tolist()
             self.probabilities = np.array(probabilities, dtype=np.dtype('float64'))
             y_pred = np.argmax(self.probabilities, axis=1).tolist()
-            y_true = self.data_df.apply(lambda row: self.labels.index(row[types.LabelType.name()]), axis=1).tolist()
+            y_true = self.data_df.apply(lambda row: data_helpers.label_to_idx(self.labels, row[types.LabelType.name()]),
+                                        axis=1).tolist()
             self.correct_prediction = [y_t == y_p for y_p, y_t in zip(y_pred, y_true)]
         else:
             self.correct_prediction = [True] * self.embeddings.shape[0]
 
         self.img_size = scale_img_size
+        # Add empty label for unlabelled data
+        self.labels.append("")
 
     def get_label(self):
         return self.labels
@@ -69,5 +74,3 @@ class DataReader:
 
     def get_indices_of_test_samples(self):
         return self.data_df.index[self.data_df[types.TestSampleFlagType.name()]].tolist()
-
-

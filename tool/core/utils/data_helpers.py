@@ -5,6 +5,13 @@ import numpy as np
 from tool.core import data_types
 
 
+def label_to_idx(labels: List[str], label: str) -> int:
+    try:
+        return labels.index(label)
+    except ValueError:
+        return -1
+
+
 def get_columns_which_start_with(df, column: str) -> List[str]:
     return [col for col in df.columns if col.startswith(column)]
 

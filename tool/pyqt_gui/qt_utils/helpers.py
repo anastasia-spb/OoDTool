@@ -71,10 +71,10 @@ class ShowImageFrame(QFrame):
         self.img_meta.append("Probabilities: " + ", ".join(strings))
         self.img_meta.append("Labels: " + ", ".join(info.labels))
         pix = QPixmap(os.path.join(info.absolute_path, info.relative_path))
-        if (pix.width() >= pix.height()) and (pix.width() > 800):
-            pix = pix.scaledToWidth(800)
-        elif (pix.height() > pix.width()) and (pix.height() > 800):
-            pix = pix.scaledToHeight(800)
+        if (pix.width() >= pix.height()) and (pix.width() > 600):
+            pix = pix.scaledToWidth(600)
+        elif (pix.height() > pix.width()) and (pix.height() > 600):
+            pix = pix.scaledToHeight(600)
         self.image_label.setPixmap(pix)
 
         # Show grid with neighbours
@@ -105,9 +105,9 @@ class SimpleImageWindow(QMainWindow):
 
     def show_image(self, img_path: str):
         pix = QPixmap(img_path)
-        if (pix.width() >= pix.height()) and (pix.width() > 800):
-            pix = pix.scaledToWidth(800)
-        elif (pix.height() > pix.width()) and (pix.height() > 800):
-            pix = pix.scaledToHeight(800)
+        if (pix.width() >= pix.height()) and (pix.width() > 600):
+            pix = pix.scaledToWidth(600)
+        elif (pix.height() > pix.width()) and (pix.height() > 600):
+            pix = pix.scaledToHeight(600)
         self.image_label.setPixmap(pix)
 

@@ -4,6 +4,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 
 from tool.core import data_types
+from tool.core.utils.data_helpers import label_to_idx
 
 
 class JpegDataset(Dataset):
@@ -18,7 +19,7 @@ class JpegDataset(Dataset):
             self.labels = []
 
     def __label_to_idx(self, label: str):
-        return self.labels.index(label)
+        return label_to_idx(self.labels, label)
 
     def get_metadata(self):
         return self.img_df

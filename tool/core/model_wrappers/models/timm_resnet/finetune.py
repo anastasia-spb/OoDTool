@@ -2,6 +2,7 @@ import pandas as pd
 import gc
 import torch
 
+from tool.core.utils import data_helpers
 from tool.core.utils.mock_missing import mock_missing
 
 try:
@@ -32,7 +33,7 @@ def finetune():
 
     labels = meta_df[data_types.LabelsType.name()][0]
     meta_df[data_types.LabelType.name()] = \
-        meta_df.apply(lambda row: labels.index(row[data_types.LabelType.name()]), axis=1)
+        meta_df.apply(lambda row: data_helpers.label_to_idx(labels, row[data_types.LabelType.name()]), axis=1)
 
     dls = ImageDataLoaders.from_df(meta_df, path=dataset_root, fn_col=data_types.RelativePathType.name(),
                                    valid_col=data_types.TestSampleFlagType.name(), bs=8,

@@ -36,11 +36,9 @@ OoDTool implements wrappers for <a href="https://github.com/pytorch/vision/blob/
 ResNet and Densenet models are created with <a href="https://timm.fast.ai/"> `timm` </a> deep-learning library implemented by <a href="https://github.com/rwightman"> Ross Wightman </a>.
 
 There are several inference scenarios:
-1. Generate only embeddings using one of supported pretrained timm models.
-In case your dataset contains only labels from <a href="https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a"> ImageNet </a>  
-dataset, then 
-
-For these models you can either use your own pretrained weights and labels or generate embeddings with pretrained on ImageNet weights.
+1. Generate only embeddings using one of supported pretrained timm models: resnet34, resnet50, densenet121
+2. Generate embeddings and predicted probabilities using pretrained model. You can define your own Labels 
+or use ImageNet labels.
 
 You can add wrapper for any model as soon as it will provide predictions and embeddings.
 There are also scrips for training models on selected data.

@@ -49,7 +49,8 @@ class ClassifierPipeline:
 
         if use_gt_for_training:
             labels = data_df[data_types.LabelsType.name()][0]
-            y_true = data_df.apply(lambda row: labels.index(row[data_types.LabelType.name()]), axis=1).values
+            y_true = data_df.apply(lambda row: data_helpers.label_to_idx(labels, row[data_types.LabelType.name()]),
+                                   axis=1).values
             y = np.array(y_true, dtype=np.dtype('float64'))
             train_indices = data_df.index[data_df[data_types.TestSampleFlagType.name()] == False].tolist()
         else:

@@ -1,4 +1,4 @@
-# Distance between embeddings
+# Density based sampling
 
 This module allows to select samples from dataset by applying density biased sampling:
 under-sample dense regions and over-sample light regions.
