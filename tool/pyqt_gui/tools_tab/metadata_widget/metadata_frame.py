@@ -47,7 +47,6 @@ class MetadataFrame(QFrame):
 
         self.settings = PathsSettings()
         self.metadata_file = None
-        self.dataset_name = ''
 
         spacing_between_layouts = 30
 
@@ -62,6 +61,7 @@ class MetadataFrame(QFrame):
         self.preview_table = QTableView()
         self.layout.addWidget(self.preview_table)
 
+        self.dataset_description_json_file = ''
         self.__get_json_file()
 
         self.setLayout(self.layout)
@@ -91,18 +91,16 @@ class MetadataFrame(QFrame):
         if len(description_files) == 0:
             return
 
+        self.dataset_description_json_file = description_files[0]
+
         self.datasets_combobox.clear()
         self.datasets_combobox.addItems(description_files)
-        self.datasets_combobox.setCurrentText(self.dataset_name)
-
-        self.dataset_description_json_file = os.path.join(self.settings.dataset_root_path, description_files[0])
-        if not os.path.isfile(self.dataset_description_json_file):
-            return
-
+        self.datasets_combobox.setCurrentText(description_files[0])
         self.json_file_line.setText(self.dataset_description_json_file)
 
     def __on_datasets_combobox_values_change(self, value):
-        self.dataset_name = value
+        self.dataset_description_json_file = value
+        self.json_file_line.setText(self.dataset_description_json_file)
         self.generate_button.setEnabled(True)
 
     def __add_generate_metadata_button(self):
@@ -114,7 +112,8 @@ class MetadataFrame(QFrame):
     def __generate_metadata(self):
         self.generate_button.setEnabled(False)
         try:
-            self.metadata_file = generate_metadata(self.dataset_description_json_file,
+            self.metadata_file = generate_metadata(os.path.join(self.settings.dataset_root_path,
+                                                                self.dataset_description_json_file),
                                                    self.settings.metadata_folder)
         except Exception as error:
             print(error)

@@ -76,7 +76,10 @@ class EmbeddingsFilesFrame(QFrame):
 
     def emit_selected_files(self):
         selected_files = self.get_selected_files()
-        selected_files.append(self.selected_probabilities)
+        if self.selected_probabilities != 'Use GT':
+            selected_files.append(os.path.join(self.settings.metadata_folder, self.selected_probabilities))
+        else:
+            selected_files.append('Use GT')
         self.selected_files_signal.emit(selected_files)
 
     def __get_all_embeddings_files(self):

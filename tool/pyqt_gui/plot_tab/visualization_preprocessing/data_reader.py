@@ -34,7 +34,6 @@ class DataReader:
 
         if os.path.isfile(ood_file):
             ood_score = self.data_df[types.OoDScoreType.name()].tolist()
-            # ood_score = [(2**score - 1.0) for score in ood_score]
             ood_score_cmap = [0.1 if score < ood_threshold else 0.9 for score in ood_score]
             self.ood_score = np.array(ood_score, dtype=np.dtype('float64'))
             self.ood_score_cmap = np.array(ood_score_cmap, dtype=np.dtype('float64'))
@@ -43,8 +42,6 @@ class DataReader:
 
         embeddings = self.data_df[types.ProjectedEmbeddingsType.name()].tolist()
         self.embeddings = np.array(embeddings, dtype=np.dtype('float64'))
-        # self.y = self.data_df.apply(lambda row: data_helpers.label_to_idx(self.labels, row[types.LabelType.name()]),
-        #                            axis=1).values
 
         if not use_gt_labels:
             probabilities = self.data_df[types.ClassProbabilitiesType.name()].tolist()
