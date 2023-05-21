@@ -80,8 +80,8 @@ class OoDMahalanobisScore:
 
         md = np.apply_along_axis(func1d=k_mahalanobis, axis=1, arr=X, gaussians_parameters=gaussians,
                                  shared_covariance=shared_cov)
-        # rmd = (md.T - md_to_background).T
-        # md = rmd
+        rmd = (md.T - md_to_background).T
+        md = rmd
 
         md = np.absolute(md)
         confidence = np.amin(md, axis=1)
