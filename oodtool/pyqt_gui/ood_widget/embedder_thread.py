@@ -4,7 +4,7 @@ import time
 from typing import List, Optional
 from PyQt5.QtCore import QThread, pyqtSignal
 
-from oodtool.core.czebra_adapter import CZebraAdapter
+from oodtool.core.towhee_adapter import TowheeAdapter
 
 
 class EmbedderPipelineThread(QThread):
@@ -16,7 +16,7 @@ class EmbedderPipelineThread(QThread):
     def __init__(self, img_df: pd.DataFrame, data_dir: str, output_dir: str, embedders_ids: List[str],
                  device: Optional[int] = None):
         super().__init__()
-        self.embedder_wrapper = CZebraAdapter(img_df, data_dir, output_dir)
+        self.embedder_wrapper = TowheeAdapter(img_df, data_dir, output_dir)
         self.embedders_ids = embedders_ids
         self.device = device
 

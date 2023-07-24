@@ -15,12 +15,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QThread, pyqtSignal
 
 from oodtool.pyqt_gui.qt_utils.qt_types import ImageInfo
-from oodtool.pyqt_gui.qt_utils.simple_image_window import SimpleImageWindow
-
-from oodtool.core.czebra_adapter.czebra_saliency_map import get_classification_models_ids, get_saliency_map
 
 
 def get_dir_layout(callback_fn, output_dir_line, label, default_dir, parent):
@@ -131,18 +127,6 @@ class ExportToCsvWindow(QMainWindow):
         self.close()
 
 
-class RequestClassificationModelIdsThread(QThread):
-    _signal = pyqtSignal(list)
-
-    # constructor
-    def __init__(self):
-        super(RequestClassificationModelIdsThread, self).__init__()
-
-    def run(self):
-        classification_models_ids = get_classification_models_ids()
-        self._signal.emit(classification_models_ids)
-
-
 class ShowImageFrame(QWidget):
     def __init__(self, parent):
         super(ShowImageFrame, self).__init__(parent)
@@ -167,16 +151,10 @@ class ShowImageFrame(QWidget):
         self.pix = None
         self.setLayout(self.layout)
 
-        self.image_menu_thread = RequestClassificationModelIdsThread()
-        self.image_menu_thread._signal.connect(self.__create_image_menu_actions)
-        self.image_menu_thread.start()
+        self.__create_image_menu_actions()
 
-    def __create_image_menu_actions(self, classification_models_ids):
+    def __create_image_menu_actions(self):
         self.image_menu = QMenu()
-        grad_menu = self.image_menu.addMenu("&Show gradient")
-        self.actions = dict()
-        for model_id in classification_models_ids:
-            self.actions[grad_menu.addAction(model_id)] = model_id
         self.export_action = self.image_menu.addAction("&Export")
 
     def wheelEvent(self, event):
@@ -196,21 +174,8 @@ class ShowImageFrame(QWidget):
         pix_pos = self.mapToGlobal(self.image_label.pos())
         click_pos = QPoint(pix_pos.x() + position.x(), pix_pos.y() + position.y())
         action = self.image_menu.exec_(click_pos)
-        if action in list(self.actions.keys()):
-            selected_model_id = self.actions[action]
-            self.__show_grad(self.current_img_info, selected_model_id)
-
-        elif action == self.export_action:
+        if action == self.export_action:
             self.__export_to_csv()
-
-    def __show_grad(self, img_meta, selected_model_id):
-        img_path = os.path.join(self.current_img_info.dataset_root_dir, self.current_img_info.relative_path)
-        if os.path.isfile(img_path):
-            maps = get_saliency_map(img_path, selected_model_id)
-            for image_map, top_class in maps:
-                simple_image_window = SimpleImageWindow(selected_model_id, top_class, self)
-                simple_image_window.show_image(image_map)
-                simple_image_window.show()
 
     def __scale_image(self, up: bool):
         if self.pix is None:

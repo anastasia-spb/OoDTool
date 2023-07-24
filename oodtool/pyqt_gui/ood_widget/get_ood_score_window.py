@@ -24,8 +24,8 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QThread, pyqtSignal
 
-from oodtool.core.czebra_adapter import determine_dataset_usecase
-from oodtool.core.czebra_adapter import usecase
+from oodtool.core.towhee_adapter import determine_dataset_usecase
+from oodtool.core.towhee_adapter import usecase
 
 from oodtool.core import data_types
 from oodtool.core.ood_score import score_by_ood, ood_score_to_df, store_ood
@@ -146,8 +146,9 @@ class OoDWidget(QWidget):
         algo_layout.addWidget(self.usecase_combobox, 1, 1)
 
         self.device_box = QCheckBox("Use cuda")
-        self.device_box.setChecked(True)
+        self.device_box.setChecked(False)
         algo_layout.addWidget(self.device_box, 1, 2)
+        self.device_box.setEnabled(False)
         self.layout.addLayout(algo_layout)
 
         self.apply_button = QPushButton("Score")

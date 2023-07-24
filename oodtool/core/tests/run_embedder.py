@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from oodtool.core.czebra_adapter import CZebraAdapter
+from oodtool.core.towhee_adapter import TowheeAdapter
 
 
 def run_embedder():
@@ -16,7 +16,7 @@ def run_embedder():
     # timm_swin_small_patch4_window7_224
     # emb_id = 'timm_resnet50'
     for emb_id in ['torch_shared-regnet_trafficlights_v13', 'timm_swin_base_patch4_window7_224', 'timm_swin_small_patch4_window7_224']:
-        embedder_wrapper = CZebraAdapter(metadata_df, data_dir, output_dir=output_dir)
+        embedder_wrapper = TowheeAdapter(metadata_df, data_dir, output_dir=output_dir)
         output_file, _ = embedder_wrapper.predict(model_id=emb_id)
         print(output_file)
 

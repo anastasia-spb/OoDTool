@@ -17,10 +17,8 @@ pytorch_lightning # LogisticRegression implemented with neuron
 jupyterlab==4.0.0 # For notebook launch
 jupyter==1.0.0
 pydantic == 1.10.10 # required by c-zebra, version has to be fixed due to error inside a package
+towhee==0.9
 
 PyQt5
 pyqtconfig
 pyqtdarktheme
-
-catalights>=0.0.11 # trafficlights_classes
-cpilot_czebra>=2.116 # inference

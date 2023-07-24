@@ -2,7 +2,7 @@ import unittest
 from parameterized import parameterized
 import os
 from oodtool.core.metadata_generator.generator import generate_metadata
-from oodtool.core.czebra_adapter import CZebraAdapter, determine_dataset_usecase
+from oodtool.core.towhee_adapter import TowheeAdapter, determine_dataset_usecase
 from oodtool.pyqt_gui.data_loader.loader import DataLoader
 from oodtool.core.ood_score import features_selector
 from oodtool.core.ood_score import score_by_ood
@@ -27,7 +27,7 @@ class TestPipeline(unittest.TestCase):
         data_loader = DataLoader()
         data_loader.load_data(dataset_root_path, metadata_folder)
 
-        embedder_wrapper = CZebraAdapter(data_loader.metadata_df, dataset_root_path, output_dir=metadata_folder)
+        embedder_wrapper = TowheeAdapter(data_loader.metadata_df, dataset_root_path, output_dir=metadata_folder)
         usecase_name = determine_dataset_usecase(data_loader.get_labels())
         embedders_ids = features_selector.OOD_METHOD_FEATURES[features_selector.OOD_ENTROPY][usecase_name]
         result_files = []

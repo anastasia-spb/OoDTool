@@ -1,6 +1,6 @@
-from oodtool.core.czebra_adapter.czebra_adapter import get_model_id_from_usecase, get_towheeresnet50_embedder_id, \
+from oodtool.core.towhee_adapter.towhee_adapter import get_towheeresnet50_embedder_id, \
     get_swin_transformer_embedder_id
-from oodtool.core.czebra_adapter import usecase
+from oodtool.core.towhee_adapter import usecase
 
 # OoD Methods names
 OOD_ENTROPY = "OoD_Entropy"
@@ -12,21 +12,9 @@ OOD_CONFIDENT_LEARNING = "OoD_ConfidentLearning"
 OOD_METHODS = [OOD_ENTROPY, OOD_ENTROPY_SWIN, OOD_KNN_DIST, OOD_KNN_DIST_SWIN, OOD_CONFIDENT_LEARNING]
 
 OOD_METHOD_FEATURES = {
-    OOD_ENTROPY: {usecase.TRAFFICLIGHTS: [get_model_id_from_usecase(usecase.TRAFFICLIGHTS),
-                                          get_towheeresnet50_embedder_id()],
-                  usecase.AGRO: [get_towheeresnet50_embedder_id(), get_model_id_from_usecase(usecase.AGRO)],
-                  usecase.OTHER: [get_towheeresnet50_embedder_id()]},
-    OOD_ENTROPY_SWIN: {usecase.TRAFFICLIGHTS: [get_model_id_from_usecase(usecase.TRAFFICLIGHTS),
-                                               get_swin_transformer_embedder_id()],
-                       usecase.AGRO: [get_swin_transformer_embedder_id(), get_model_id_from_usecase(usecase.AGRO)],
-                       usecase.OTHER: [get_swin_transformer_embedder_id()]},
-    OOD_KNN_DIST: {usecase.TRAFFICLIGHTS: [get_model_id_from_usecase(usecase.TRAFFICLIGHTS)],
-                   usecase.AGRO: [get_model_id_from_usecase(usecase.AGRO)],
-                   usecase.OTHER: [get_towheeresnet50_embedder_id()]},
-    OOD_KNN_DIST_SWIN: {usecase.TRAFFICLIGHTS: [get_swin_transformer_embedder_id()],
-                        usecase.AGRO: [get_swin_transformer_embedder_id()],
-                        usecase.OTHER: [get_swin_transformer_embedder_id()]},
-    OOD_CONFIDENT_LEARNING: {usecase.TRAFFICLIGHTS: [get_model_id_from_usecase(usecase.TRAFFICLIGHTS)],
-                             usecase.AGRO: [],
-                             usecase.OTHER: []}
+    OOD_ENTROPY: {usecase.OTHER: [get_towheeresnet50_embedder_id()]},
+    OOD_ENTROPY_SWIN: {usecase.OTHER: [get_swin_transformer_embedder_id()]},
+    OOD_KNN_DIST: {usecase.OTHER: [get_towheeresnet50_embedder_id()]},
+    OOD_KNN_DIST_SWIN: {usecase.OTHER: [get_swin_transformer_embedder_id()]},
+    OOD_CONFIDENT_LEARNING: {usecase.OTHER: []}
 }

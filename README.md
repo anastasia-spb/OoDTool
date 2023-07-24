@@ -17,8 +17,6 @@ python3 -m venv ood_env
 
 source ood_env/bin/activate
 
-pip config set global.extra-index-url 'https://gitlab.cognitivepilot.com/api/v4/projects/347/packages/pypi/simple'
-
 pip install --upgrade pip
 
 pip install oodtool

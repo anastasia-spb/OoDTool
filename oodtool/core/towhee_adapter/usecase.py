@@ -1,0 +1,2 @@
+OTHER = "other"
+USECASES = [OTHER]

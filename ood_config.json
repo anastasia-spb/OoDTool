@@ -1,4 +1,4 @@
 {
-    "dataset_root_path": "/home/vlasova/datasets/TrafficLightsDVC",
-    "metadata_folder": "/home/vlasova/datasets/TrafficLightsDVC/oodsession_20"
+    "dataset_root_path": "/home/vlasova/datasets/ood_datasets/CatsDogs",
+    "metadata_folder": "/home/vlasova/datasets/ood_datasets/CatsDogs/oodsession_5"
 }

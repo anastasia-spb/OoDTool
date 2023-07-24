@@ -1,4 +1,0 @@
-TRAFFICLIGHTS = "trafficlights"
-AGRO = "agro"
-OTHER = "other"
-USECASES = [TRAFFICLIGHTS, AGRO, OTHER]
