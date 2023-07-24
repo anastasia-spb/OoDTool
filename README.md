@@ -19,7 +19,7 @@ source ood_env/bin/activate
 
 pip install --upgrade pip
 
-pip install oodtool
+pip install -e . 
 ```
 
 _Troubleshooting_
@@ -41,7 +41,7 @@ virtualenv --python C:\Path\To\Python\python.exe ood_env
 
 pip install --upgrade pip
 
-pip install oodtool --extra-index-url "https://gitlab.cognitivepilot.com/api/v4/projects/347/packages/pypi/simple"
+pip install -e . 
 
 ```
 
@@ -49,7 +49,7 @@ _Troubleshooting_
   > * Error: Could not run 'aten::*' with arguments from the 'CUDA' backend.
   >   Solution - use CPU: 
   >   ```bash
-  >   pip install oodtool --extra-index-url "https://gitlab.cognitivepilot.com/api/v4/projects/347/packages/pypi/simple" --extra-index-url "https://download.pytorch.org/whl/cpu"
+  >   pip install -e . --extra-index-url "https://download.pytorch.org/whl/cpu"
   >   ```
 
 Example dataset can be found [here](./example_data/DogsCats)
@@ -57,6 +57,11 @@ Example dataset can be found [here](./example_data/DogsCats)
 ```bash
 python -m oodtool
 ```
+
+### Notes
+
+For public version saliency map generation and traffic lights embedder are not available.
+
 
 ![](readme_data/tool.png)
 
