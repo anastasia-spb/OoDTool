@@ -1,0 +1,37 @@
+{
+  "Dataset": {
+    "name": "DatasetDescription",
+    "folders": [
+      {
+        "path": "images/train/pedestrian_tl_01_stop",
+        "label": "pedestrian_tl_01_stop",
+        "test": false
+      },
+      {
+        "path": "images/train/pedestrian_tl_10_forward",
+        "label": "pedestrian_tl_10_forward",
+        "test": false
+      },
+      {
+        "path": "images/test/pedestrian_tl_01_stop",
+        "label": "pedestrian_tl_01_stop",
+        "test": true
+      },
+      {
+        "path": "images/test/pedestrian_tl_10_forward",
+        "label": "pedestrian_tl_10_forward",
+        "test": true
+      },
+      {
+        "path": "images/test/trash",
+        "label": "trash",
+        "test": true
+      }
+    ],
+    "labels": [
+      "pedestrian_tl_01_stop",
+      "pedestrian_tl_10_forward",
+      "trash"
+    ]
+  }
+}

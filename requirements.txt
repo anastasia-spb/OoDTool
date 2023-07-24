@@ -1,22 +1,26 @@
-numpy
 pandas
 scikit-learn
 scipy
-matplotlib~=3.7.1
-tqdm
-Pillow
-trimap
-umap-learn
-astropy
+matplotlib~=3.7.1 # Plot data
+tqdm # Progress bar
+trimap # TriMap dimensionality reduction implementation
+umap-learn # UMAP dimensionality reduction implementation
+Pillow # image read
+seaborn # color palette
+distinctipy # generates distinct list of colors for legend and plot
 
-huggingface-hub
-torch~=2.0.0
-torchvision~=0.15.1
-transformers~=4.27.3
-pytorch_lightning
+torch==1.12.1
+torchvision==0.13.1
+timm==0.6.13
+cleanlab>=2.4.0
+pytorch_lightning # LogisticRegression implemented with neuron
+jupyterlab==4.0.0 # For notebook launch
+jupyter==1.0.0
+pydantic == 1.10.10 # required by c-zebra, version has to be fixed due to error inside a package
 
 PyQt5
 pyqtconfig
 pyqtdarktheme
-timm
-towhee
+
+catalights>=0.0.11 # trafficlights_classes
+cpilot_czebra>=2.116 # inference

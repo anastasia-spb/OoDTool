@@ -1,3 +1,4 @@
 {
-    "dataset_root_path": "/home/nastya/Desktop/OoDTool/example_data/DogsCats"
+    "dataset_root_path": "/home/vlasova/datasets/TrafficLightsDVC",
+    "metadata_folder": "/home/vlasova/datasets/TrafficLightsDVC/oodsession_20"
 }

@@ -1,0 +1,36 @@
+INFO:root:processing event type 14 for object SessionTypeSelectWindow took 4ms
+WARNING:root:No metadata found in the selected session session .
+INFO:root:processing event type 77 for object  took 11ms
+INFO:root:processing event type 12 for object qt_scrollarea_viewport took 2ms
+INFO:root:processing event type 206 for object QComboBoxPrivateContainerClassWindow took 2ms
+INFO:root:processing event type 3 for object  took 44ms
+INFO:root:processing event type 3 for object OoDScoreWindowClassWindow took 45ms
+INFO:root:processing event type 12 for object  took 16ms
+INFO:root:processing event type 12 for object  took 13ms
+INFO:timm.models.helpers:Loading pretrained weights from url (https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window7_224_22kto1k.pth)
+INFO:root:processing event type 43 for object  took 10ms
+INFO:root:processing event type 77 for object  took 19ms
+INFO:root:processing event type 5 for object  took 5ms
+INFO:root:processing event type 5 for object AppClassWindow took 8ms
+INFO:root:processing event type 43 for object  took 4ms
+INFO:root:processing event type 12 for object qt_scrollarea_viewport took 3ms
+INFO:root:processing event type 12 for object qt_scrollarea_viewport took 2ms
+INFO:root:processing event type 12 for object qt_scrollarea_viewport took 2ms
+INFO:root:processing event type 12 for object qt_scrollarea_viewport took 2ms
+INFO:root:processing event type 77 for object  took 2ms
+INFO:root:processing event type 12 for object qt_scrollarea_viewport took 2ms
+INFO:root:processing event type 3 for object  took 2ms
+INFO:root:processing event type 3 for object FileDiaolgWidgetClassWindow took 2ms
+INFO:root:processing event type 3 for object  took 46ms
+INFO:root:processing event type 3 for object OoDScoreWindowClassWindow took 47ms
+INFO:timm.models.helpers:Loading pretrained weights from url (https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window7_224_22kto1k.pth)
+INFO:root:processing event type 12 for object qt_scrollarea_viewport took 2ms
+INFO:root:processing event type 206 for object QComboBoxPrivateContainerClassWindow took 3ms
+INFO:root:processing event type 3 for object  took 43ms
+INFO:root:processing event type 3 for object OoDScoreWindowClassWindow took 44ms
+INFO:timm.models.helpers:Loading pretrained weights from url (https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window7_224_22kto1k.pth)
+INFO:root:processing event type 77 for object  took 4ms
+INFO:root:processing event type 206 for object QComboBoxPrivateContainerClassWindow took 2ms
+INFO:timm.models.helpers:Loading pretrained weights from url (https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window7_224_22kto1k.pth)
+INFO:root:processing event type 77 for object  took 11ms
+INFO:root:processing event type 77 for object  took 11ms
