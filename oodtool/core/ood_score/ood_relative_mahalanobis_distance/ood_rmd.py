@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 from typing import List, Callable, Optional, Union
 from oodtool.core.data_types import types
 from oodtool.core.utils import data_helpers
@@ -21,7 +22,7 @@ def k_mahalanobis(embedding, means, shared_covariance):
     return dist
 
 
-def rmd(X_train: np.ndarray, y_train: str, X_test: np.ndarray,
+def rmd(X_train: np.ndarray, y_train: np.ndarray, X_test: np.ndarray,
         relative: bool = True, bayes: bool = False,
         progress_callback: Callable[[List[int]], None] = None,
         logs_callback: Callable[[str], None] = None) -> np.ndarray:
@@ -32,20 +33,31 @@ def rmd(X_train: np.ndarray, y_train: str, X_test: np.ndarray,
 
     label_encoder = preprocessing.LabelEncoder()
     y_train_cat = label_encoder.fit_transform(y_train)
-    num_classes = len(label_encoder.classes_)
+    labels = np.unique(y_train_cat)
 
-    if bayes:
-        # Fit the K class conditional Bayesian
-        model = BayesianGaussianMixture(n_components=num_classes, covariance_type='tied', random_state=0).fit(X_train,
-                                                                                                              y_train_cat)
-    else:
-        # Fit the K class conditional Gaussian
-        model = GaussianMixture(n_components=num_classes, covariance_type='tied', random_state=0).fit(X_train,
-                                                                                                      y_train_cat)
+    models = []
+    number_of_features = []
+    for label in labels:
+        x_train_k_indices = np.argwhere(y_train_cat == label)
+        number_of_features.append(x_train_k_indices.shape[0])
+        if bayes:
+            model = BayesianGaussianMixture(n_components=1, covariance_type='full', random_state=0).fit(
+                X_train[x_train_k_indices.flatten(), :])
+        else:
+            model = GaussianMixture(n_components=1, covariance_type='full', random_state=0).fit(
+                X_train[x_train_k_indices.flatten(), :])
+        models.append(model)
+
+    means = [m.means_.flatten() for m in models]
+
+    covariance = (number_of_features[0] - 1) * models[0].covariances_
+    for i in range(1, len(models)):
+        covariance += (number_of_features[i] - 1) * models[i].covariances_
+    covariance = np.divide(covariance, X_train.shape[0])
 
     # Compute Relative Mahalanobis distance for each sample (NxK)
-    md = np.apply_along_axis(func1d=k_mahalanobis, axis=1, arr=X_test, means=model.means_,
-                             shared_covariance=model.covariances_)
+    md = np.apply_along_axis(func1d=k_mahalanobis, axis=1, arr=X_test, means=means,
+                             shared_covariance=covariance)
     if relative:
         if bayes:
             # Fit the background Bayesian
@@ -83,3 +95,15 @@ def score(embeddings_file: str, metadata_df: pd.DataFrame,
 
     return rmd(embeddings[train_indices, :], y_train[train_indices], embeddings, relative=relative, bayes=bayes,
                progress_callback=progress_callback, logs_callback=logs_callback)
+
+
+def run():
+    ood_session_dir = '/home/vlasova/datasets/ood_datasets/Letters_v20_b/dataset/oodsession_0'
+    metadata_file_path = os.path.join(ood_session_dir, 'DatasetDescription.meta.pkl')
+    metadata_df = pd.read_pickle(metadata_file_path)
+    embeddings_file = 'timm_swin_base_patch4_window7_224.emb.pkl'
+    ood_score = score(os.path.join(ood_session_dir, embeddings_file), metadata_df)
+
+
+if __name__ == "__main__":
+    run()
